@@ -31,17 +31,33 @@ Build for impact, not perfection:
 - Prefer small diffs over large rewrites
 - Preserve existing code style and patterns
 - Use `cn()` from `@/lib/utils` for className merging
-- Client-only rendering - no SSR or server-side React
+- Pages render on the server (TanStack Start on Workers) and hydrate in the browser. Route `beforeLoad` and loaders run on the server for the first request, so keep them free of browser-only APIs
 
 Do not modify:
 
 - `src/components/ui/` - managed by shadcn CLI
 - `src/routeTree.gen.ts` - auto-generated
 
+## Where Things Live
+
+| Task | Start in |
+| --- | --- |
+| Add or change a page | `src/routes/` (file-based; see `src/routes/example/`) |
+| Read or write data from the UI | `src/server/` server functions + TanStack Query options |
+| Change tables | `src/db/schema.ts`, then `pnpm db:push` |
+| Auth behavior or protected routes | `src/lib/auth.ts`, `src/routes/__root.tsx`, `src/routes/example/account.tsx` |
+| Bindings, secrets, Previews | `wrangler.jsonc`, `wrangler.preview-migrations.jsonc`, `.dev.vars.example` |
+| Tests and test setup | `*.test.ts` next to the code, `src/test/setup.ts`, `test` in `vite.config.ts` |
+| Lint, format, build config | `vite.config.ts` |
+| Agent hooks, plugins, MCP | `.claude/settings.json`, `.claude/hooks/`, `.mcp.json` |
+
 ## Commands
 
 ```bash
-pnpm dev                              # start dev server
+pnpm dev                              # start dev server (http://localhost:3000)
+pnpm test                             # all tests, in workerd against a migrated D1
+pnpm test src/lib/auth.test.ts        # one test file
+pnpm verify                           # check + test: the gate before you finish
 pnpm db:push                          # generate + apply a migration to local D1
 pnpm cf-typegen                       # regenerate binding types after editing wrangler.jsonc
 pnpm lint path/to/file.tsx            # lint a file with Oxlint
@@ -50,6 +66,18 @@ pnpm typecheck                        # type check the project
 pnpm check                            # run all static checks
 ```
 
+## Verification
+
+Prove a change works before calling it done:
+
+- **Run the narrowest check first.** Use one test file or `pnpm lint <file>` while iterating, then `pnpm verify` once at the end. A Stop hook runs `pnpm verify` whenever the working tree has changes and sends failures back to you; fix them rather than working around the hook.
+- **Add or update a test** for behavior you change in `src/server/`, `src/lib/`, or `src/db/`. Tests run in workerd with a real, migrated D1 (no mocks), so call the real code: the `db` client, `auth.handler`, and so on.
+- **Inspect local data and logs** while `pnpm dev` runs through the Local Explorer API at `http://localhost:3000/cdn-cgi/local/explorer/api`. Use `GET .../d1/database` to find the local D1 and run SQL against it, and `POST .../local/observability/query` to query request traces and console logs with SQL. Fetch `.../explorer/api` for the full OpenAPI schema only if those aren't enough.
+- **Check UI changes in a browser** (for example, the `agent-browser` CLI) and include what you saw, not just "it should work".
+- **Report evidence**: the commands you ran and their results, in the final message or PR description.
+
+A PostToolUse hook formats and lints each file you edit. Re-read a file before editing it again, because the formatter may have changed it.
+
 ## Database Workflow
 
 The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`. Server code reads the `DB` binding and secrets through `cloudflare:workers`, not `process.env`.
@@ -57,6 +85,8 @@ The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`
 **Local development:** After changing `src/db/schema.ts`, run `pnpm db:push`. It generates a SQL migration in `migrations/` and applies it to the local D1 copy in `.wrangler/`. Commit the migration files.
 
 **Deploying:** `pnpm run deploy` (not `pnpm deploy`, which is a pnpm built-in) applies pending migrations to the remote D1 database before running `wrangler deploy`.
+
+**Previews:** each branch or pull request gets a Workers Preview whose `DB` is a shared staging database (`previews` in `wrangler.jsonc`), never production. `pnpm run deploy:preview` migrates that database and deploys a Preview for the current branch.
 
 ## Auth
 
@@ -89,6 +119,15 @@ Do not:
 - Use array index as React keys
 - Add heavy dependencies without approval
 - Use inline styles instead of Tailwind
+
+## Known Agent Mistakes
+
+When an agent gets something wrong in a way a rule or script would have prevented, add a line here (or better, a check that catches it). Delete lines that no longer apply.
+
+- `pnpm deploy` runs pnpm's built-in deploy command, not the script. Use `pnpm run deploy`.
+- `process.env` isn't how server code reads config. Import `env` from `cloudflare:workers`, or use `@/lib/env-server` for validated secrets.
+- Don't hand-edit `.claude/skills/` or `skills-lock.json`; they're managed by the `skills` CLI.
+- Don't send session tokens to the client. Route context is serialized into the page, so `getSession` in `src/server/auth.ts` returns only the user and expiry.
 
 ## Finding Patterns
 

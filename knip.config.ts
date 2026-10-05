@@ -1,7 +1,8 @@
 import type { KnipConfig } from "knip";
 
 const config: KnipConfig = {
-  entry: ["src/components/ui/**"],
+  // Claude Code runs the hook scripts; see `hooks` in .claude/settings.json.
+  entry: ["src/components/ui/**", ".claude/hooks/*.mjs"],
   ignore: [
     "src/lib/env-client.ts",
     "src/lib/intake-questions.ts",

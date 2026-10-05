@@ -72,14 +72,27 @@ pnpm run deploy
 
 After the first deploy, connect the repository in the Cloudflare dashboard under **Workers & Pages → quickstart → Settings → Builds → Connect**. The Worker name must match `name` in `wrangler.jsonc`. Use these settings:
 
-| Setting                              | Value                                                   |
-| ------------------------------------ | ------------------------------------------------------- |
-| Build command                        | `pnpm build`                                            |
-| Deploy command                       | `pnpm db:migrate:remote && pnpm wrangler deploy`        |
-| Non-production branch deploy command | `pnpm wrangler versions upload`                         |
-| Build variable                       | `PNPM_VERSION` = `11.22.0` (the build image ships 10.x) |
+| Setting         | Value                                                   |
+| --------------- | ------------------------------------------------------- |
+| Build command   | `pnpm build`                                            |
+| Deploy command  | `pnpm db:migrate:remote && pnpm wrangler deploy`        |
+| Preview command | `pnpm db:migrate:preview && pnpm wrangler preview`      |
+| Build variable  | `PNPM_VERSION` = `11.22.0` (the build image ships 10.x) |
 
-Runtime secrets stay in **Settings → Variables & Secrets**. Build variables are not visible to the Worker at runtime. Non-production branches upload a preview version without running migrations. Previews use the same D1 database as production, so treat them as read-mostly.
+Runtime secrets stay in **Settings → Variables & Secrets**. Build variables are not visible to the Worker at runtime.
+
+### Preview every pull request
+
+With Preview Builds enabled, every branch gets its own [Workers Preview](https://developers.cloudflare.com/workers/previews/): a production-like URL that Workers Builds comments on the pull request. Previews never touch production data. They bind `DB` to a shared staging database, configured in the `previews` block of `wrangler.jsonc` and in `wrangler.preview-migrations.jsonc`.
+
+One-time setup:
+
+```bash
+pnpm wrangler d1 create quickstart-preview   # paste the id into both files above
+pnpm wrangler preview base-config secret put BETTER_AUTH_SECRET
+```
+
+Leave `BETTER_AUTH_URL` unset for Previews so Better Auth uses each Preview's own URL. To create a Preview from your machine instead of Workers Builds, run `pnpm run deploy:preview`.
 
 ## Authentication
 
@@ -116,6 +129,9 @@ worker-configuration.d.ts  # Generated binding types; run `pnpm cf-typegen`
 pnpm dev                # start the development server
 pnpm build              # create a production build
 pnpm run deploy         # build, migrate the remote D1 database, and deploy
+pnpm run deploy:preview # build, migrate the preview D1 database, and deploy a Preview
+pnpm test               # run tests in workerd against a migrated D1
+pnpm verify             # check + test; the gate agents must pass before finishing
 pnpm check              # run formatting, lint, and type checks
 pnpm format             # format the repository with Oxfmt
 pnpm lint               # lint the repository with Oxlint
@@ -126,6 +142,7 @@ pnpm db:push            # generate a migration and apply it to local D1
 pnpm db:generate        # generate a migration from the Drizzle schema
 pnpm db:migrate         # apply migrations to local D1
 pnpm db:migrate:remote  # apply migrations to the deployed D1 database
+pnpm db:migrate:preview # apply migrations to the shared Preview D1 database
 pnpm db:seed            # seed example data into local D1
 ```
 

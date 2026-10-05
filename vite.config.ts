@@ -1,4 +1,5 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import oxlintConfig from "@tractorbeam/oxlint-config";
@@ -26,12 +27,16 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  plugins: [
-    cloudflare({ viteEnvironment: { name: "ssr" } }),
-    tanstackStart(),
-    viteReact(),
-    tailwindcss(),
-  ],
+  // Vitest loads this file too; the Workers dev plugin conflicts with its
+  // server, and tests bring their own plugins in `test.projects` below.
+  plugins: process.env.VITEST
+    ? []
+    : [
+        cloudflare({ viteEnvironment: { name: "ssr" } }),
+        tanstackStart(),
+        viteReact(),
+        tailwindcss(),
+      ],
   fmt: {
     ...oxfmtConfig,
     ignorePatterns: [...oxfmtConfig.ignorePatterns, ...generatedPatterns],
@@ -61,5 +66,31 @@ export default defineConfig({
   },
   ssr: {
     noExternal: ["streamdown"],
+  },
+  test: {
+    projects: [
+      {
+        // Inline projects don't inherit the app plugins above, so tests run in
+        // workerd with only the Workers test integration loaded.
+        resolve: { tsconfigPaths: true },
+        plugins: [
+          cloudflareTest(async () => ({
+            miniflare: {
+              d1Databases: ["DB"],
+              bindings: {
+                BETTER_AUTH_SECRET: "test-secret-at-least-32-characters-long",
+                BETTER_AUTH_URL: "http://localhost:3000",
+                TEST_MIGRATIONS: await readD1Migrations("migrations"),
+              },
+            },
+          })),
+        ],
+        test: {
+          name: "workers",
+          include: ["src/**/*.test.ts"],
+          setupFiles: ["src/test/setup.ts"],
+        },
+      },
+    ],
   },
 });

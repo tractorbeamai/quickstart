@@ -18,4 +18,17 @@
   "observability": {
     "enabled": true,
   },
+  // Workers Previews (`wrangler preview`): one per branch/PR, never touching
+  // production data. All Previews share this staging database; keep its id in
+  // sync with wrangler.preview-migrations.jsonc. Replace the id with the one
+  // from `pnpm wrangler d1 create quickstart-preview`.
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "quickstart-preview",
+        "database_id": "00000000-0000-0000-0000-000000000001",
+      },
+    ],
+  },
 }
