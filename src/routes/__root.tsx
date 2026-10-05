@@ -3,15 +3,18 @@
 import { ReactNode } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { Analytics } from "@vercel/analytics/react";
 
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { getSession } from "@/server/auth";
 import appCss from "@/styles.css?url";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
+  // Every route sees `session` in its context. Call router.invalidate() after
+  // signing in or out to refresh it.
+  beforeLoad: async () => ({ session: await getSession() }),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -44,7 +47,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
-        <Analytics />
         <Scripts />
       </body>
     </html>

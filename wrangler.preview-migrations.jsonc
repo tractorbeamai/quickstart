@@ -1,0 +1,16 @@
+// Used only by `pnpm db:migrate:preview` to apply migrations to the database
+// that Workers Previews bind to. It must point at the same database as the
+// `previews.d1_databases` entry in wrangler.jsonc.
+// https://developers.cloudflare.com/workers/previews/resources/#d1-migrations
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "quickstart",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      "binding": "PREVIEW_DB",
+      "database_name": "quickstart-preview",
+      "migrations_dir": "migrations",
+    },
+  ],
+}

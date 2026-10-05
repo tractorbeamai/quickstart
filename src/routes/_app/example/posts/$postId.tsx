@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { findPostByIdQueryOptions } from "@/server/posts";
 
-export const Route = createFileRoute("/example/posts/$postId")({
+export const Route = createFileRoute("/_app/example/posts/$postId")({
   loader: async ({ params: { postId }, context }) => {
     await context.queryClient.ensureQueryData(findPostByIdQueryOptions({ id: Number(postId) }));
   },
@@ -19,7 +19,7 @@ function PostDetail() {
 
   if (!post) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="mx-auto w-full max-w-5xl py-8">
         <Card>
           <CardHeader>
             <CardTitle>Post Not Found</CardTitle>
@@ -34,7 +34,7 @@ function PostDetail() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="mx-auto w-full max-w-5xl py-8">
       <div className="mb-4">
         <Button variant="ghost" render={<Link to="/example/posts" />}>
           &larr; Back to Posts

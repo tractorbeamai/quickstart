@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "docs-index": {
+      "type": "http",
+      "url": "https://index.mintlify.com/mcp"
+    }
+  }
+}

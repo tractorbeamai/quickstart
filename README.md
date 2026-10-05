@@ -1,16 +1,17 @@
 # Tractorbeam Quickstart
 
-A React starter for building polished demos quickly. It uses TanStack Start,
-React 19, TanStack Router and Query, shadcn/ui, Tailwind CSS v4, Drizzle ORM,
-Neon Postgres, a TanStack Form example, and an optional streaming AI chat example.
+A React starter for building polished demos quickly. It runs TanStack Start on Cloudflare Workers with React 19, TanStack Router and Query, shadcn/ui, Tailwind CSS v4, Drizzle ORM on Cloudflare D1, Better Auth email and password sign-in, a TanStack Form example, and an optional streaming AI chat example.
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/tractorbeamai/quickstart)
 
 ## Features
 
 - React 19 with TypeScript
-- TanStack Start with file-based routing
+- TanStack Start with file-based routing, deployed natively to Cloudflare Workers
 - TanStack Query for data fetching and caching
 - Server functions for type-safe server logic
-- Drizzle ORM, drizzle-zod, and Neon Postgres
+- Drizzle ORM, drizzle-zod, and Cloudflare D1 (SQLite)
+- Better Auth with email and password sign-in and a protected route example
 - Vite Plus with shared Tractorbeam Oxlint and Oxfmt configuration
 - Tailwind CSS v4 and shadcn/ui
 - TanStack Form with shadcn/ui fields and Zod validation
@@ -22,7 +23,7 @@ Neon Postgres, a TanStack Form example, and an optional streaming AI chat exampl
 
 - Node.js 24.11 or newer within Node 24
 - pnpm 11.22 or newer
-- A Neon database
+- A Cloudflare account, only for deploying. Local development runs D1 in Miniflare with no account.
 - An Anthropic API key if you want to run the chat example
 
 ### Install and run
@@ -33,30 +34,50 @@ cd quickstart
 pnpm install
 ```
 
-Create `.env.local` with your database connection. Add the Anthropic key if you
-want to use the chat example:
-
-```dotenv
-DATABASE_URL=your_neon_connection_string
-ANTHROPIC_API_KEY=your_key_here
-```
-
-Initialize the database and start the app:
+Create the local D1 database, seed it, and start the app. The first `pnpm dev` creates `.dev.vars` with a generated `BETTER_AUTH_SECRET`; add `ANTHROPIC_API_KEY` there if you want to use the chat example.
 
 ```bash
-pnpm db:push
+pnpm db:migrate
+pnpm db:seed
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000), then go to [/login](http://localhost:3000/login) to create an account.
 
-### Deploy with Vercel
+### Deploy to Cloudflare
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftractorbeamai%2Fquickstart&env=ANTHROPIC_API_KEY&envDescription=API%20key%20for%20the%20optional%20Anthropic%20chat%20example&envLink=https%3A%2F%2Fconsole.anthropic.com%2Fsettings%2Fkeys&project-name=quickstart&products=%5B%7B%22type%22%3A%22integration%22%2C%22protocol%22%3A%22storage%22%2C%22productSlug%22%3A%22neon%22%2C%22integrationSlug%22%3A%22neon%22%7D%5D)
+The **Deploy to Cloudflare** button above copies this repository to your GitHub or GitLab account, creates the Worker and its D1 database, and sets up Workers Builds so every push deploys and every pull request gets a Preview. It asks for nothing.
 
-The deployment flow creates a Vercel project, clones the repository, and can
-provision a Neon database. Add `ANTHROPIC_API_KEY` when prompted if you are
-keeping the chat example.
+To deploy from your machine instead, run `pnpm run deploy` (`pnpm deploy` is a pnpm built-in). It builds, applies migrations, and deploys, creating the D1 database and generating `BETTER_AUTH_SECRET` the first time; an existing secret is never replaced. Set `CLOUDFLARE_ACCOUNT_ID` to choose the account if your login has several.
+
+```bash
+pnpm wrangler login
+pnpm run deploy
+pnpm wrangler secret put ANTHROPIC_API_KEY   # optional, for the chat example
+```
+
+### Workers Builds
+
+To connect an existing Worker yourself, go to **Workers & Pages → quickstart → Settings → Builds → Connect** in the Cloudflare dashboard. The Worker name must match `name` in `wrangler.jsonc`. Use these settings:
+
+| Setting         | Value                                                   |
+| --------------- | ------------------------------------------------------- |
+| Build command   | `pnpm build`                                            |
+| Deploy command  | `pnpm run deploy`                                       |
+| Preview command | `pnpm run deploy:preview`                               |
+| Build variable  | `PNPM_VERSION` = `11.22.0` (the build image ships 10.x) |
+
+The deploy script skips its own build under Workers Builds, so each push builds once. Runtime secrets live in **Settings → Variables & Secrets**; build variables aren't visible to the Worker.
+
+### Previews
+
+Each branch gets a [Workers Preview](https://developers.cloudflare.com/workers/previews/), a production-like URL that Workers Builds comments on the pull request. Previews bind `DB` to a shared `quickstart-preview` database (the `previews` block in `wrangler.jsonc`, plus `wrangler.preview-migrations.jsonc`), never production. Keep the Preview command as `pnpm run deploy:preview`, not plain `wrangler preview`: it migrates that database and gives each new Preview its own `BETTER_AUTH_SECRET`. Run it yourself to preview the current branch.
+
+## Authentication
+
+Better Auth is configured in `src/lib/auth.ts` and mounted at `/api/auth/*` by `src/routes/api/auth/$.ts`. Its tables live in `src/db/auth-schema.ts`, which was generated by the Better Auth CLI. Regenerate it if you add plugins that need new tables.
+
+The root route loads the session in `beforeLoad`, so every route can read `context.session`. `src/routes/_app/example/account.tsx` shows how to protect a route by redirecting to `/login`. Use `authClient` from `src/lib/auth-client.ts` in components to sign in, sign up, and sign out. After any of these, call `router.invalidate()` to refresh the session in route context.
 
 ## Project structure
 
@@ -64,33 +85,46 @@ keeping the chat example.
 src/
 ├── components/
 │   ├── ui/                # shadcn/ui components managed by the CLI
-│   └── header.tsx         # Example navigation
-├── db/                    # Drizzle client, schema, and seed data
-├── lib/                   # Environment validation and utilities
+│   ├── app-sidebar.tsx    # shadcn sidebar-07 block; nav items live here
+│   └── nav-*.tsx          # Sidebar sections and user menu
+├── db/                    # Drizzle client, app and auth schema, seed data
+├── lib/                   # Auth, environment validation, and utilities
 ├── routes/
-│   ├── __root.tsx         # Root route
-│   ├── index.tsx          # Home page
-│   └── example/           # Chat, form, posts, and REST examples
+│   ├── __root.tsx         # Root route; loads the session
+│   ├── _app.tsx           # Sidebar layout for every page except /login
+│   ├── _app/              # Home page and the account, chat, form, posts, and REST examples
+│   ├── login.tsx          # Sign in and sign up
+│   ├── api/auth/$.ts      # Better Auth handler
+│   └── example/api.chat.ts # Chat example's streaming API route
 ├── server/                # Server functions
 ├── routeTree.gen.ts       # Generated route tree; do not edit
 └── styles.css             # Global styles and Tailwind configuration
+migrations/                # SQL migrations applied to D1 by Wrangler
+wrangler.jsonc             # Worker name, D1 binding, compatibility settings
+worker-configuration.d.ts  # Generated binding types; run `pnpm cf-typegen`
 ```
 
 ## Commands
 
 ```bash
-pnpm dev              # start the development server
-pnpm build            # create a production build
-pnpm check            # run formatting, lint, and type checks
-pnpm format           # format the repository with Oxfmt
-pnpm lint             # lint the repository with Oxlint
-pnpm typecheck        # run TypeScript checks
-pnpm lint:knip        # find unused code and dependencies
-pnpm db:push          # sync the schema directly in development
-pnpm db:generate      # generate database migrations
-pnpm db:migrate       # apply database migrations
-pnpm db:seed          # seed example data
-pnpm db:studio        # open Drizzle Studio
+pnpm dev                # start the development server
+pnpm build              # create a production build
+pnpm run deploy         # build, migrate the remote D1 database, and deploy
+pnpm run deploy:preview # build, migrate the preview D1 database, and deploy a Preview
+pnpm test               # run tests in workerd against a migrated D1
+pnpm verify             # check + test; the gate agents must pass before finishing
+pnpm check              # run formatting, lint, and type checks
+pnpm format             # format the repository with Oxfmt
+pnpm lint               # lint the repository with Oxlint
+pnpm typecheck          # run TypeScript checks
+pnpm lint:knip          # find unused code and dependencies
+pnpm cf-typegen         # regenerate binding types after editing wrangler.jsonc
+pnpm db:push            # generate a migration and apply it to local D1
+pnpm db:generate        # generate a migration from the Drizzle schema
+pnpm db:migrate         # apply migrations to local D1
+pnpm db:migrate:remote  # apply migrations to the deployed D1 database
+pnpm db:migrate:preview # apply migrations to the shared Preview D1 database
+pnpm db:seed            # seed example data into local D1
 ```
 
 ## Removing the AI chat features
@@ -100,20 +134,17 @@ The chat example is isolated from the posts, REST, database, and routing example
 1. Delete the chat routes and first-party shadcn chat components:
 
    ```bash
-   rm src/routes/example/chat.tsx src/routes/example/api.chat.ts
+   rm src/routes/_app/example/chat.tsx src/routes/example/api.chat.ts
    rm src/components/ui/bubble.tsx
    rm src/components/ui/message.tsx
    rm src/components/ui/message-scroller.tsx
    ```
 
-2. Remove the `Chat` navigation item from `src/components/header.tsx`.
+2. Remove the `Chat` item from `navMain` in `src/components/app-sidebar.tsx`.
 
-3. Remove `ANTHROPIC_API_KEY` from `src/lib/env-server.ts` and from your local
-   and deployed environment variables.
+3. Remove `ANTHROPIC_API_KEY` from `src/lib/env-server.ts`, `.dev.vars`, and `.dev.vars.example`, and delete the deployed secret with `pnpm wrangler secret delete ANTHROPIC_API_KEY`.
 
-4. Delete the Streamdown `@source` line from `src/styles.css` and remove
-   `streamdown` from `ssr.noExternal` in `vite.config.ts`. If the array is then
-   empty, remove the entire `ssr` block.
+4. Delete the Streamdown `@source` line from `src/styles.css` and remove `streamdown` from `ssr.noExternal` in `vite.config.ts`. If the array is then empty, remove the entire `ssr` block.
 
 5. Remove the chat packages:
 
@@ -128,17 +159,16 @@ The chat example is isolated from the posts, REST, database, and routing example
    pnpm check
    ```
 
-`src/routeTree.gen.ts` is generated automatically during the build and should
-not be edited by hand.
+`src/routeTree.gen.ts` is generated automatically during the build and should not be edited by hand.
 
 ## Adding a route
 
-Create a file in `src/routes/` and export a file route:
+Create a file in `src/routes/_app/` to render inside the sidebar layout (or directly in `src/routes/` for a full-screen page like `/login`), export a file route, and add it to `navMain` in `src/components/app-sidebar.tsx`:
 
 ```tsx
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/about")({
+export const Route = createFileRoute("/_app/about")({
   component: AboutPage,
 });
 

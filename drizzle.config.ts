@@ -1,13 +1,9 @@
 import { defineConfig } from "drizzle-kit";
-import { loadEnv } from "vite";
 
-const env = loadEnv("development", process.cwd(), ["DATABASE_URL"]);
-
+// Drizzle Kit only generates SQL here. Wrangler applies it to D1 with
+// `pnpm db:migrate` (local) and `pnpm db:migrate:remote` (deployed).
 export default defineConfig({
-  dialect: "postgresql",
+  dialect: "sqlite",
   schema: "./src/db/schema.ts",
   out: "./migrations",
-  dbCredentials: {
-    url: env.DATABASE_URL,
-  },
 });

@@ -1,0 +1,13 @@
+# Local secrets. `pnpm dev` copies this to .dev.vars on first run and fills in
+# BETTER_AUTH_SECRET. Deployed Workers and Previews get their own generated
+# secret from `pnpm run deploy` / `pnpm run deploy:preview`. The Deploy to
+# Cloudflare button prompts for uncommented values only, so it asks for nothing.
+
+# Generated automatically; set it yourself to pin a value.
+# BETTER_AUTH_SECRET=
+
+# Optional: Better Auth uses the request's origin when this is unset.
+# BETTER_AUTH_URL=http://localhost:3000
+
+# Optional: only needed for the chat example.
+# ANTHROPIC_API_KEY=sk-ant-...

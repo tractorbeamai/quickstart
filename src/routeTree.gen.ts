@@ -9,32 +9,55 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ExampleChatRouteImport } from './routes/example/chat'
-import { Route as ExampleFormRouteImport } from './routes/example/form'
-import { Route as ExampleRestApiRouteImport } from './routes/example/rest-api'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppExampleAccountRouteImport } from './routes/_app/example/account'
+import { Route as AppExampleChatRouteImport } from './routes/_app/example/chat'
+import { Route as AppExampleFormRouteImport } from './routes/_app/example/form'
+import { Route as AppExampleRestApiRouteImport } from './routes/_app/example/rest-api'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ExampleApiChatRouteImport } from './routes/example/api.chat'
-import { Route as ExamplePostsIndexRouteImport } from './routes/example/posts/index'
-import { Route as ExamplePostsPostIdRouteImport } from './routes/example/posts/$postId'
+import { Route as AppExamplePostsIndexRouteImport } from './routes/_app/example/posts/index'
+import { Route as AppExamplePostsPostIdRouteImport } from './routes/_app/example/posts/$postId'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const ExampleChatRoute = ExampleChatRouteImport.update({
+const AppExampleAccountRoute = AppExampleAccountRouteImport.update({
+  id: '/example/account',
+  path: '/example/account',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppExampleChatRoute = AppExampleChatRouteImport.update({
   id: '/example/chat',
   path: '/example/chat',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const ExampleFormRoute = ExampleFormRouteImport.update({
+const AppExampleFormRoute = AppExampleFormRouteImport.update({
   id: '/example/form',
   path: '/example/form',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const ExampleRestApiRoute = ExampleRestApiRouteImport.update({
+const AppExampleRestApiRoute = AppExampleRestApiRouteImport.update({
   id: '/example/rest-api',
   path: '/example/rest-api',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExampleApiChatRoute = ExampleApiChatRouteImport.update({
@@ -42,113 +65,158 @@ const ExampleApiChatRoute = ExampleApiChatRouteImport.update({
   path: '/example/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExamplePostsIndexRoute = ExamplePostsIndexRouteImport.update({
+const AppExamplePostsIndexRoute = AppExamplePostsIndexRouteImport.update({
   id: '/example/posts/',
   path: '/example/posts/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const ExamplePostsPostIdRoute = ExamplePostsPostIdRouteImport.update({
+const AppExamplePostsPostIdRoute = AppExamplePostsPostIdRouteImport.update({
   id: '/example/posts/$postId',
   path: '/example/posts/$postId',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/example/chat': typeof ExampleChatRoute
-  '/example/form': typeof ExampleFormRoute
-  '/example/rest-api': typeof ExampleRestApiRoute
+  '/': typeof AppIndexRoute
+  '/login': typeof LoginRoute
+  '/example/account': typeof AppExampleAccountRoute
+  '/example/chat': typeof AppExampleChatRoute
+  '/example/form': typeof AppExampleFormRoute
+  '/example/rest-api': typeof AppExampleRestApiRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/example/api/chat': typeof ExampleApiChatRoute
-  '/example/posts/$postId': typeof ExamplePostsPostIdRoute
-  '/example/posts/': typeof ExamplePostsIndexRoute
+  '/example/posts/$postId': typeof AppExamplePostsPostIdRoute
+  '/example/posts/': typeof AppExamplePostsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/example/chat': typeof ExampleChatRoute
-  '/example/form': typeof ExampleFormRoute
-  '/example/rest-api': typeof ExampleRestApiRoute
+  '/login': typeof LoginRoute
+  '/': typeof AppIndexRoute
+  '/example/account': typeof AppExampleAccountRoute
+  '/example/chat': typeof AppExampleChatRoute
+  '/example/form': typeof AppExampleFormRoute
+  '/example/rest-api': typeof AppExampleRestApiRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/example/api/chat': typeof ExampleApiChatRoute
-  '/example/posts/$postId': typeof ExamplePostsPostIdRoute
-  '/example/posts': typeof ExamplePostsIndexRoute
+  '/example/posts/$postId': typeof AppExamplePostsPostIdRoute
+  '/example/posts': typeof AppExamplePostsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/example/chat': typeof ExampleChatRoute
-  '/example/form': typeof ExampleFormRoute
-  '/example/rest-api': typeof ExampleRestApiRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/example/account': typeof AppExampleAccountRoute
+  '/_app/example/chat': typeof AppExampleChatRoute
+  '/_app/example/form': typeof AppExampleFormRoute
+  '/_app/example/rest-api': typeof AppExampleRestApiRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/example/api/chat': typeof ExampleApiChatRoute
-  '/example/posts/$postId': typeof ExamplePostsPostIdRoute
-  '/example/posts/': typeof ExamplePostsIndexRoute
+  '/_app/example/posts/$postId': typeof AppExamplePostsPostIdRoute
+  '/_app/example/posts/': typeof AppExamplePostsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/login'
+    | '/example/account'
     | '/example/chat'
     | '/example/form'
     | '/example/rest-api'
+    | '/api/auth/$'
     | '/example/api/chat'
     | '/example/posts/$postId'
     | '/example/posts/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/login'
     | '/'
+    | '/example/account'
     | '/example/chat'
     | '/example/form'
     | '/example/rest-api'
+    | '/api/auth/$'
     | '/example/api/chat'
     | '/example/posts/$postId'
     | '/example/posts'
   id:
     | '__root__'
-    | '/'
-    | '/example/chat'
-    | '/example/form'
-    | '/example/rest-api'
+    | '/_app'
+    | '/login'
+    | '/_app/'
+    | '/_app/example/account'
+    | '/_app/example/chat'
+    | '/_app/example/form'
+    | '/_app/example/rest-api'
+    | '/api/auth/$'
     | '/example/api/chat'
-    | '/example/posts/$postId'
-    | '/example/posts/'
+    | '/_app/example/posts/$postId'
+    | '/_app/example/posts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ExampleChatRoute: typeof ExampleChatRoute
-  ExampleFormRoute: typeof ExampleFormRoute
-  ExampleRestApiRoute: typeof ExampleRestApiRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ExampleApiChatRoute: typeof ExampleApiChatRoute
-  ExamplePostsPostIdRoute: typeof ExamplePostsPostIdRoute
-  ExamplePostsIndexRoute: typeof ExamplePostsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/example/chat': {
-      id: '/example/chat'
+    '/_app/example/account': {
+      id: '/_app/example/account'
+      path: '/example/account'
+      fullPath: '/example/account'
+      preLoaderRoute: typeof AppExampleAccountRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/example/chat': {
+      id: '/_app/example/chat'
       path: '/example/chat'
       fullPath: '/example/chat'
-      preLoaderRoute: typeof ExampleChatRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppExampleChatRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/example/form': {
-      id: '/example/form'
+    '/_app/example/form': {
+      id: '/_app/example/form'
       path: '/example/form'
       fullPath: '/example/form'
-      preLoaderRoute: typeof ExampleFormRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppExampleFormRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/example/rest-api': {
-      id: '/example/rest-api'
+    '/_app/example/rest-api': {
+      id: '/_app/example/rest-api'
       path: '/example/rest-api'
       fullPath: '/example/rest-api'
-      preLoaderRoute: typeof ExampleRestApiRouteImport
+      preLoaderRoute: typeof AppExampleRestApiRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/example/api/chat': {
@@ -158,31 +226,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExampleApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/example/posts/': {
-      id: '/example/posts/'
+    '/_app/example/posts/': {
+      id: '/_app/example/posts/'
       path: '/example/posts'
       fullPath: '/example/posts/'
-      preLoaderRoute: typeof ExamplePostsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppExamplePostsIndexRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/example/posts/$postId': {
-      id: '/example/posts/$postId'
+    '/_app/example/posts/$postId': {
+      id: '/_app/example/posts/$postId'
       path: '/example/posts/$postId'
       fullPath: '/example/posts/$postId'
-      preLoaderRoute: typeof ExamplePostsPostIdRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppExamplePostsPostIdRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppExampleAccountRoute: typeof AppExampleAccountRoute
+  AppExampleChatRoute: typeof AppExampleChatRoute
+  AppExampleFormRoute: typeof AppExampleFormRoute
+  AppExampleRestApiRoute: typeof AppExampleRestApiRoute
+  AppExamplePostsPostIdRoute: typeof AppExamplePostsPostIdRoute
+  AppExamplePostsIndexRoute: typeof AppExamplePostsIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppExampleAccountRoute: AppExampleAccountRoute,
+  AppExampleChatRoute: AppExampleChatRoute,
+  AppExampleFormRoute: AppExampleFormRoute,
+  AppExampleRestApiRoute: AppExampleRestApiRoute,
+  AppExamplePostsPostIdRoute: AppExamplePostsPostIdRoute,
+  AppExamplePostsIndexRoute: AppExamplePostsIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ExampleChatRoute: ExampleChatRoute,
-  ExampleFormRoute: ExampleFormRoute,
-  ExampleRestApiRoute: ExampleRestApiRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   ExampleApiChatRoute: ExampleApiChatRoute,
-  ExamplePostsPostIdRoute: ExamplePostsPostIdRoute,
-  ExamplePostsIndexRoute: ExamplePostsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

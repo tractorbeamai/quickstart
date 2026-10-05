@@ -3,11 +3,15 @@ allowBuilds:
   lightningcss: true
   msw: false
   unrs-resolver: true
+  workerd: true
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@0.2.9
   vite-plus: 0.2.9
+  # Must match the Vitest bundled with vite-plus (`vp --version`).
+  vitest: 4.1.10
 overrides:
   vite: "catalog:"
+  vitest: "catalog:"
 peerDependencyRules:
   allowAny:
     - vite

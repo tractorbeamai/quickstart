@@ -1,25 +1,49 @@
+import { cloudflare } from "@cloudflare/vite-plugin";
+import { cloudflareTest, readD1Migrations } from "@cloudflare/vitest-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import oxlintConfig from "@tractorbeam/oxlint-config";
 import oxfmtConfig from "@tractorbeam/oxfmt-config";
 import viteReact from "@vitejs/plugin-react";
-import { nitro } from "nitro/vite";
 import { defineConfig } from "vite-plus";
 
 const lint = oxlintConfig();
+
+const generatedPatterns = [
+  // Vendored by the `skills` CLI; edits would drift from skills-lock.json.
+  ".claude/skills/**",
+  "skills-lock.json",
+  ".tanstack/**",
+  ".wrangler/**",
+  "migrations/meta/**",
+  "worker-configuration.d.ts",
+];
 
 export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
-  plugins: [tanstackStart(), nitro(), viteReact(), tailwindcss()],
+  // The README and docs link to http://localhost:3000.
+  server: {
+    port: 3000,
+  },
+  // Vitest loads this file too; the Workers dev plugin conflicts with its
+  // server, and tests bring their own plugins in `test.projects` below.
+  plugins: process.env.VITEST
+    ? []
+    : [
+        cloudflare({ viteEnvironment: { name: "ssr" } }),
+        tanstackStart(),
+        viteReact(),
+        tailwindcss(),
+      ],
   fmt: {
     ...oxfmtConfig,
-    ignorePatterns: [...oxfmtConfig.ignorePatterns, ".output/**", ".tanstack/**"],
+    ignorePatterns: [...oxfmtConfig.ignorePatterns, ...generatedPatterns],
   },
   lint: {
     ...lint,
-    ignorePatterns: ["**/*.gen.*", ".output/**", ".tanstack/**", "src/components/ui/**"],
+    ignorePatterns: ["**/*.gen.*", ...generatedPatterns, "src/components/ui/**"],
     options: {
       typeAware: true,
       typeCheck: true,
@@ -28,6 +52,8 @@ export default defineConfig({
       ...lint.rules,
       "import/no-namespace": ["error", { ignore: ["@/db/schema"] }],
       "no-console": "off",
+      // Default in the next @tractorbeam/oxlint-config release; drop once on it.
+      "no-nested-ternary": "error",
     },
     overrides: [
       {
@@ -41,5 +67,38 @@ export default defineConfig({
   ssr: {
     noExternal: ["streamdown"],
   },
-  nitro: {},
+  test: {
+    projects: [
+      {
+        // Inline projects don't inherit the app plugins above, so tests run in
+        // workerd with only the Workers test integration loaded.
+        resolve: { tsconfigPaths: true },
+        plugins: [
+          cloudflareTest(async () => {
+            // Match wrangler.jsonc's runtime and D1 bindings. Its `main` only
+            // exists inside a TanStack Start build, so pass the settings
+            // through instead of `wrangler.configPath`.
+            const { unstable_readConfig } = await import("wrangler");
+            const worker = unstable_readConfig({ config: "./wrangler.jsonc" });
+            return {
+              miniflare: {
+                compatibilityDate: worker.compatibility_date,
+                compatibilityFlags: worker.compatibility_flags,
+                d1Databases: worker.d1_databases.map(({ binding }: { binding: string }) => binding),
+                bindings: {
+                  BETTER_AUTH_SECRET: "test-secret-at-least-32-characters-long",
+                  TEST_MIGRATIONS: await readD1Migrations("migrations"),
+                },
+              },
+            };
+          }),
+        ],
+        test: {
+          name: "workers",
+          include: ["src/**/*.test.ts"],
+          setupFiles: ["src/test/setup.ts"],
+        },
+      },
+    ],
+  },
 });

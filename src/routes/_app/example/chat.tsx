@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/message-scroller";
 import { Spinner } from "@/components/ui/spinner";
 
-export const Route = createFileRoute("/example/chat")({
+export const Route = createFileRoute("/_app/example/chat")({
   component: ChatPage,
 });
 

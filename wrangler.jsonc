@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "quickstart",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  // No database_id: `pnpm run deploy` and the Deploy to Cloudflare button
+  // create the database by name on first deploy. Local dev uses a Miniflare
+  // copy in .wrangler/.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "quickstart",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "observability": {
+    "enabled": true,
+  },
+  // Workers Previews (`wrangler preview`): one per branch/PR, never touching
+  // production data. All Previews share this staging database; keep it in
+  // sync with wrangler.preview-migrations.jsonc.
+  "previews": {
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "quickstart-preview",
+      },
+    ],
+  },
+}
