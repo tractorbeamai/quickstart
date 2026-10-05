@@ -1,0 +1,22 @@
+# Codex project config, loaded when this repo is trusted. Mirrors
+# .claude/settings.json and .mcp.json; see "Agent Setup" in AGENTS.md.
+
+[mcp_servers.cloudflare]
+url = "https://mcp.cloudflare.com/mcp"
+
+[mcp_servers.docs-index]
+url = "https://index.mintlify.com/mcp"
+
+[marketplaces.better-auth-agent-skills]
+source_type = "git"
+source = "https://github.com/better-auth/skills.git"
+
+[marketplaces.tractorbeam]
+source_type = "git"
+source = "https://github.com/tractorbeamai/skills.git"
+
+[plugins."auth-skills@better-auth-agent-skills"]
+enabled = true
+
+[plugins."code-style@tractorbeam"]
+enabled = true
