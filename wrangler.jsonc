@@ -4,9 +4,9 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
-  // No database_id: Wrangler and the Deploy to Cloudflare button create the
-  // database on first deploy (automatic provisioning). Local dev uses a
-  // Miniflare copy in .wrangler/.
+  // No database_id: `pnpm run deploy` and the Deploy to Cloudflare button
+  // create the database by name on first deploy. Local dev uses a Miniflare
+  // copy in .wrangler/.
   "d1_databases": [
     {
       "binding": "DB",

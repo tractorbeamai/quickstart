@@ -7,6 +7,7 @@ import { randomBytes } from "node:crypto";
 import { rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { unstable_readConfig } from "wrangler";
 
 const preview = process.argv.includes("--preview");
 const run = (args) => execFileSync("pnpm", args, { stdio: "inherit" });
@@ -14,6 +15,14 @@ const run = (args) => execFileSync("pnpm", args, { stdio: "inherit" });
 // Workers Builds runs the build command before this deploy command.
 if (!process.env.WORKERS_CI) {
   run(["build"]);
+}
+
+// `wrangler deploy` provisions a missing D1 database, but migrations run
+// first and don't, so create it on a first deploy from a fresh account.
+const config = preview ? "wrangler.preview-migrations.jsonc" : "wrangler.jsonc";
+const database = unstable_readConfig({ config }).d1_databases[0]?.database_name;
+if (database && spawnSync("pnpm", ["exec", "wrangler", "d1", "info", database]).status !== 0) {
+  run(["exec", "wrangler", "d1", "create", database, "--no-update-config"]);
 }
 run([preview ? "db:migrate:preview" : "db:migrate:remote"]);
 

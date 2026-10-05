@@ -48,7 +48,7 @@ Open [http://localhost:3000](http://localhost:3000), then go to [/login](http://
 
 The **Deploy to Cloudflare** button above copies this repository to your GitHub or GitLab account, creates the Worker and its D1 database, and sets up Workers Builds so every push deploys and every pull request gets a Preview. It asks for nothing.
 
-To deploy from your machine instead, run `pnpm run deploy` (`pnpm deploy` is a pnpm built-in). It builds, applies migrations, and deploys. Wrangler creates the D1 database on the first deploy, and the deploy generates `BETTER_AUTH_SECRET` if the Worker doesn't have one yet; an existing secret is never replaced.
+To deploy from your machine instead, run `pnpm run deploy` (`pnpm deploy` is a pnpm built-in). It builds, applies migrations, and deploys, creating the D1 database and generating `BETTER_AUTH_SECRET` the first time; an existing secret is never replaced. Set `CLOUDFLARE_ACCOUNT_ID` to choose the account if your login has several.
 
 ```bash
 pnpm wrangler login
