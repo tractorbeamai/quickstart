@@ -11,6 +11,7 @@ const lint = oxlintConfig();
 
 const generatedPatterns = [
   // Vendored by the `skills` CLI; edits would drift from skills-lock.json.
+  ".agents/skills/**",
   ".claude/skills/**",
   "skills-lock.json",
   ".tanstack/**",

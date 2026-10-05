@@ -49,7 +49,7 @@ Do not modify:
 | Bindings, secrets, Previews | `wrangler.jsonc`, `wrangler.preview-migrations.jsonc`, `.dev.vars.example` |
 | Tests and test setup | `*.test.ts` next to the code, `src/test/setup.ts`, `test` in `vite.config.ts` |
 | Lint, format, build config | `vite.config.ts` |
-| Agent plugins and MCP | `.claude/settings.json`, `.mcp.json` |
+| Agent skills, plugins, and MCP | See Agent Setup below |
 
 ## Commands
 
@@ -88,13 +88,30 @@ Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (br
 
 Library APIs in this stack change faster than model training data. Check current guidance before writing or debugging library-specific code. Use the most specific source first:
 
-1. **Installed skills.** TanStack Router and Start come through Intent (see Skill Loading above). Cloudflare (Workers, D1, Wrangler) and Better Auth come from the Claude Code plugins in `.claude/settings.json`. shadcn/ui and the AI SDK have no Claude Code plugin, so their skills are installed with the `skills` CLI into `.claude/skills/` and pinned in `skills-lock.json`. Update them with `npx skills update`, and add new ones with `npx skills add <owner/repo> --skill <name> --agent claude-code`. Use a Claude Code plugin instead when one exists.
-2. **`docs-index` MCP server** (`.mcp.json`). Its `context` tool searches current first-party documentation and returns a short answer with citations. Use it when:
+1. **Installed skills.** TanStack Router and Start come through Intent (see Skill Loading above). Better Auth comes from a plugin, and Cloudflare (Workers, D1, Wrangler), shadcn/ui, and the AI SDK from `.agents/skills/` (see Agent Setup below).
+2. **`docs-index` MCP server.** Its `context` tool searches current first-party documentation and returns a short answer with citations. Use it when:
    - No skill covers the library: Drizzle ORM and drizzle-kit, Tailwind CSS v4, React 19, TanStack Query and Form, Zod 4, Vite+ (`vp`), Oxlint, and Oxfmt.
    - A skill doesn't answer the question, or you need to confirm an API, config option, or CLI flag for the version in `package.json`.
    - You're debugging an error that looks like library behavior (types, config, runtime) rather than this repo's code.
 
    Pass the library name as `product` and ask a specific implementation question. Don't use it to search this repository; read the code instead.
+
+## Agent Setup
+
+Claude Code and Codex get the same instructions, skills, plugins, and MCP servers. Change both configs together.
+
+| What                     | Claude Code                  | Codex                |
+| ------------------------ | ---------------------------- | -------------------- |
+| Instructions             | `AGENTS.md`                  | `AGENTS.md`          |
+| Skills (`skills` CLI)    | `.claude/skills/` (symlinks) | `.agents/skills/`    |
+| Plugins and marketplaces | `.claude/settings.json`      | `.codex/config.toml` |
+| MCP servers              | `.mcp.json`                  | `.codex/config.toml` |
+
+- **Plugins:** `auth-skills@better-auth-agent-skills` and `code-style@tractorbeam` work in both agents under the same names. `typescript-lsp` is Claude Code only.
+- **Skills without a plugin:** install for both agents with `npx skills add <owner/repo> --skill <name> --agent claude-code codex`. The CLI writes the skill to `.agents/skills/`, links it into `.claude/skills/`, and pins it in `skills-lock.json`. Update with `npx skills update`. Prefer a plugin when one exists.
+- **Cloudflare:** the `cloudflare/skills` plugin can't drop individual skills, so its skills come through the `skills` CLI instead, minus the Sandbox, Next.js, and Turnstile ones, and its MCP server (`cloudflare`) is configured directly.
+- **MCP servers:** `cloudflare` (Cloudflare API, OAuth on first use) and `docs-index`.
+- **Codex first run:** trust the project, then run `codex plugin marketplace upgrade` once to fetch the marketplaces in `.codex/config.toml`.
 
 ## Do / Do Not
 
@@ -118,7 +135,7 @@ When an agent gets something wrong in a way a rule or script would have prevente
 
 - `pnpm deploy` runs pnpm's built-in deploy command, not the script. Use `pnpm run deploy`.
 - `process.env` isn't how server code reads config. Import `env` from `cloudflare:workers`, or use `@/lib/env-server` for validated secrets.
-- Don't hand-edit `.claude/skills/` or `skills-lock.json`; they're managed by the `skills` CLI.
+- Don't hand-edit `.agents/skills/`, `.claude/skills/`, or `skills-lock.json`; they're managed by the `skills` CLI.
 - Don't send session tokens to the client. Route context is serialized into the page, so `getSession` in `src/server/auth.ts` returns only the user and expiry.
 
 ## Finding Patterns
