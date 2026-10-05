@@ -42,7 +42,7 @@ The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`
 
 **Local development:** After changing `src/db/schema.ts`, run `pnpm db:push`. It generates a SQL migration in `migrations/` and applies it to the local D1 copy in `.wrangler/`. Commit the migration files.
 
-**Deploying:** `pnpm deploy` applies pending migrations to the remote D1 database before running `wrangler deploy`.
+**Deploying:** `pnpm run deploy` (not `pnpm deploy`, which is a pnpm built-in) applies pending migrations to the remote D1 database before running `wrangler deploy`.
 
 ## Auth
 

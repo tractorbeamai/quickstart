@@ -31,12 +31,11 @@ export const posts = sqliteTable("posts", {
 });
 
 // Zod schemas generated from Drizzle schema
-export const postIdSchema = z.object({
-  id: z.int().positive(),
-});
+const postId = z.int().positive();
+export const postIdSchema = z.object({ id: postId });
 export const selectPostSchema = createSelectSchema(posts);
 export const insertPostSchema = createInsertSchema(posts);
-export const updatePostSchema = createUpdateSchema(posts).extend(postIdSchema.shape);
+export const updatePostSchema = createUpdateSchema(posts).extend({ id: postId });
 
 // Types inferred from schemas
 export type PostId = z.infer<typeof postIdSchema>;
@@ -111,12 +110,11 @@ export const intakeResponses = sqliteTable("intake_responses", {
 });
 
 // Zod schemas for candidates
-export const candidateIdSchema = z.object({
-  id: z.uuid(),
-});
+const candidateId = z.uuid();
+export const candidateIdSchema = z.object({ id: candidateId });
 export const selectCandidateSchema = createSelectSchema(candidates);
 export const insertCandidateSchema = createInsertSchema(candidates);
-export const updateCandidateSchema = createUpdateSchema(candidates).extend(candidateIdSchema.shape);
+export const updateCandidateSchema = createUpdateSchema(candidates).extend({ id: candidateId });
 
 // Types for candidates
 export type CandidateId = z.infer<typeof candidateIdSchema>;
