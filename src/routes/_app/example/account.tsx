@@ -38,7 +38,7 @@ function AccountPage() {
   }, [navigate, router]);
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl justify-center px-6 py-24">
+    <main className="mx-auto flex w-full max-w-5xl justify-center py-8">
       <Card className="w-full sm:max-w-md">
         <CardHeader className="flex flex-row items-center gap-4">
           <Avatar className="size-12">

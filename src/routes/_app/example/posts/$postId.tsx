@@ -19,7 +19,7 @@ function PostDetail() {
 
   if (!post) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="mx-auto w-full max-w-5xl py-8">
         <Card>
           <CardHeader>
             <CardTitle>Post Not Found</CardTitle>
@@ -34,7 +34,7 @@ function PostDetail() {
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="mx-auto w-full max-w-5xl py-8">
       <div className="mb-4">
         <Button variant="ghost" render={<Link to="/example/posts" />}>
           &larr; Back to Posts

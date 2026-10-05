@@ -67,7 +67,7 @@ function FormPage() {
   const handleReset = useCallback(() => form.reset(), [form]);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl items-center justify-center p-6">
+    <main className="mx-auto flex w-full max-w-5xl justify-center py-8">
       <Card className="w-full sm:max-w-md">
         <CardHeader>
           <CardTitle>Bug Report</CardTitle>

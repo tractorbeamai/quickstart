@@ -24,7 +24,7 @@ function PostsIndex() {
   const { data: posts } = useSuspenseQuery(listPostsQueryOptions());
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="mx-auto w-full max-w-5xl py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Posts</h1>
