@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { findPostByIdQueryOptions } from "@/server/posts";
 
-export const Route = createFileRoute("/example/posts/$postId")({
+export const Route = createFileRoute("/_app/example/posts/$postId")({
   loader: async ({ params: { postId }, context }) => {
     await context.queryClient.ensureQueryData(findPostByIdQueryOptions({ id: Number(postId) }));
   },

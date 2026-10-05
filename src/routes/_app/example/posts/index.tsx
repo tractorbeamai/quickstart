@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { listPostsQueryOptions } from "@/server/posts";
 
-export const Route = createFileRoute("/example/posts/")({
+export const Route = createFileRoute("/_app/example/posts/")({
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(listPostsQueryOptions());
   },

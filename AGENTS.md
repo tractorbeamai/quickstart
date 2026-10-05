@@ -42,10 +42,10 @@ Do not modify:
 
 | Task | Start in |
 | --- | --- |
-| Add or change a page | `src/routes/` (file-based; see `src/routes/example/`) |
+| Add or change a page | `src/routes/_app/` (inside the sidebar layout) or `src/routes/` (full-screen); add nav links to `navMain` in `src/components/app-sidebar.tsx` |
 | Read or write data from the UI | `src/server/` server functions + TanStack Query options |
 | Change tables | `src/db/schema.ts`, then `pnpm db:push` |
-| Auth behavior or protected routes | `src/lib/auth.ts`, `src/routes/__root.tsx`, `src/routes/example/account.tsx` |
+| Auth behavior or protected routes | `src/lib/auth.ts`, `src/routes/__root.tsx`, `src/routes/_app/example/account.tsx` |
 | Bindings, secrets, Previews | `wrangler.jsonc`, `wrangler.preview-migrations.jsonc`, `.dev.vars.example` |
 | Tests and test setup | `*.test.ts` next to the code, `src/test/setup.ts`, `test` in `vite.config.ts` |
 | Lint, format, build config | `vite.config.ts` |
@@ -82,7 +82,7 @@ The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`
 
 ## Auth
 
-Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/example/account.tsx`. Call `router.invalidate()` after signing in or out.
+Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/_app/example/account.tsx`. Call `router.invalidate()` after signing in or out.
 
 ## Library Docs
 
@@ -123,4 +123,4 @@ When an agent gets something wrong in a way a rule or script would have prevente
 
 ## Finding Patterns
 
-See README.md for project structure, deployment, and the full command list, and `src/routes/example/` for working reference implementations.
+See README.md for project structure, deployment, and the full command list, and `src/routes/_app/example/` for working reference implementations.
