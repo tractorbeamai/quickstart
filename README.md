@@ -86,7 +86,7 @@ src/
 ├── components/
 │   ├── ui/                # shadcn/ui components managed by the CLI
 │   ├── app-sidebar.tsx    # shadcn sidebar-07 block; nav items live here
-│   └── nav-*.tsx          # Sidebar sections, user menu, and team switcher
+│   └── nav-*.tsx          # Sidebar sections and user menu
 ├── db/                    # Drizzle client, app and auth schema, seed data
 ├── lib/                   # Auth, environment validation, and utilities
 ├── routes/
