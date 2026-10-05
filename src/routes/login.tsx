@@ -36,6 +36,7 @@ function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("sign-in");
   const isSignUp = mode === "sign-up";
+  const submitLabel = isSignUp ? "Create account" : "Sign in";
 
   const form = useForm({
     defaultValues: { name: "", email: "", password: "" },
@@ -153,7 +154,7 @@ function LoginPage() {
           <form.Subscribe selector={(state) => state.isSubmitting}>
             {(isSubmitting) => (
               <Button className="w-full" disabled={isSubmitting} form="login-form" type="submit">
-                {isSubmitting ? "Working..." : isSignUp ? "Create account" : "Sign in"}
+                {isSubmitting ? "Working..." : submitLabel}
               </Button>
             )}
           </form.Subscribe>
