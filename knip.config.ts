@@ -9,7 +9,8 @@ const config: KnipConfig = {
     "src/server/**",
   ],
   ignoreExportsUsedInFile: true,
-  ignoreDependencies: ["@tanstack/router-plugin", "neonctl", "vercel"],
+  // `cloudflare:workers` is a Workers runtime module, not an npm package.
+  ignoreDependencies: ["@tanstack/router-plugin", "cloudflare"],
 };
 
 export default config;

@@ -1,6 +1,14 @@
-import { db } from "./client";
+import { drizzle } from "drizzle-orm/d1";
+import { getPlatformProxy } from "wrangler";
+
 import { candidates, intakeResponses } from "./schema";
 import type { AIAnalysis, CandidateStatus, PipelineStage } from "./schema";
+
+// Runs in Node, outside the Worker, so it borrows the local D1 binding from
+// Wrangler instead of `cloudflare:workers`. Seeds the same .wrangler/ database
+// that `pnpm dev` uses.
+const proxy = await getPlatformProxy<Env>();
+const db = drizzle(proxy.env.DB);
 
 // Seed data for Taurean Talent Network
 
@@ -635,11 +643,13 @@ async function seed() {
   console.log(`   ${mockCandidates.length} candidates created`);
   console.log(`   ${mockCandidates.filter((c) => c.qualified).length} qualified`);
   console.log(`   ${mockCandidates.filter((c) => !c.qualified).length} not qualified`);
-
-  process.exit(0);
 }
 
-seed().catch((error) => {
+try {
+  await seed();
+} catch (error) {
   console.error("❌ Seeding failed:", error);
-  process.exit(1);
-});
+  process.exitCode = 1;
+} finally {
+  await proxy.dispose();
+}

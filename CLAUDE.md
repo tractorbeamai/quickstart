@@ -28,7 +28,8 @@ Do not modify:
 
 ```bash
 pnpm dev                              # start dev server
-pnpm db:push                          # push schema to database (dev)
+pnpm db:push                          # generate + apply a migration to local D1
+pnpm cf-typegen                       # regenerate binding types after editing wrangler.jsonc
 pnpm lint path/to/file.tsx            # lint a file with Oxlint
 pnpm format path/to/file.tsx          # format a file with Oxfmt
 pnpm typecheck                        # type check the project
@@ -37,9 +38,15 @@ pnpm check                            # run all static checks
 
 ## Database Workflow
 
-**Local development:** Use `pnpm db:push` to sync schema changes directly.
+The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`. Server code reads the `DB` binding and secrets through `cloudflare:workers`, not `process.env`.
 
-**Before deploying:** Run `pnpm db:generate` to create migration files, commit them, then `pnpm db:migrate` in production.
+**Local development:** After changing `src/db/schema.ts`, run `pnpm db:push`. It generates a SQL migration in `migrations/` and applies it to the local D1 copy in `.wrangler/`. Commit the migration files.
+
+**Deploying:** `pnpm deploy` applies pending migrations to the remote D1 database before running `wrangler deploy`.
+
+## Auth
+
+Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/example/account.tsx`. Call `router.invalidate()` after signing in or out.
 
 ## Do / Do Not
 

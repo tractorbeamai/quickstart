@@ -3,6 +3,7 @@ allowBuilds:
   lightningcss: true
   msw: false
   unrs-resolver: true
+  workerd: true
 catalog:
   vite: npm:@voidzero-dev/vite-plus-core@0.2.9
   vite-plus: 0.2.9

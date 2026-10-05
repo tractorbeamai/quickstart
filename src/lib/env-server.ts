@@ -1,16 +1,15 @@
+import { env as workerEnv } from "cloudflare:workers";
 import { z } from "zod";
 
+// Secrets come from .dev.vars locally and `wrangler secret put` in production.
+// Bindings such as DB are typed by worker-configuration.d.ts instead.
 export const envServerSchema = z.object({
-  DATABASE_URL: z.string().min(1),
+  BETTER_AUTH_SECRET: z.string().min(32),
+  BETTER_AUTH_URL: z.url().optional(),
   ANTHROPIC_API_KEY: z.string().trim().min(1).optional(),
-  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 
-const result = envServerSchema.safeParse({
-  DATABASE_URL: process.env.DATABASE_URL,
-  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
-  NODE_ENV: process.env.NODE_ENV,
-});
+const result = envServerSchema.safeParse(workerEnv);
 
 if (!result.success) {
   console.error("❌ Invalid environment variables:");

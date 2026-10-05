@@ -73,5 +73,8 @@ Desktop.ini
 .git
 *.orig
 
-# Neon
-.neon
+# Cloudflare
+.wrangler
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
