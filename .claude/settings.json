@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "enabledPlugins": {
+    "cloudflare@cloudflare": true,
+    "shadcn@shadcn-ui": true
+  },
+  "extraKnownMarketplaces": {
+    "cloudflare": {
+      "source": {
+        "source": "github",
+        "repo": "cloudflare/skills"
+      }
+    },
+    "shadcn-ui": {
+      "source": {
+        "source": "settings",
+        "name": "shadcn-ui",
+        "plugins": [
+          {
+            "name": "shadcn",
+            "source": {
+              "source": "github",
+              "repo": "shadcn-ui/ui"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
