@@ -2,6 +2,8 @@
 
 A React starter for building polished demos quickly. It runs TanStack Start on Cloudflare Workers with React 19, TanStack Router and Query, shadcn/ui, Tailwind CSS v4, Drizzle ORM on Cloudflare D1, Better Auth email and password sign-in, a TanStack Form example, and an optional streaming AI chat example.
 
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/tractorbeamai/quickstart)
+
 ## Features
 
 - React 19 with TypeScript
@@ -47,18 +49,13 @@ Open [http://localhost:3000](http://localhost:3000), then go to [/login](http://
 
 ### Deploy to Cloudflare
 
-Log in, create the D1 database, and copy the `database_id` it prints into `wrangler.jsonc`:
+**One click:** the **Deploy to Cloudflare** button above copies this repository to your GitHub or GitLab account, creates the Worker and its D1 database, asks for `BETTER_AUTH_SECRET`, and sets up Workers Builds so every push deploys and every pull request gets a Preview.
+
+**From your machine:** log in and set the secrets. The D1 database doesn't need creating; Wrangler provisions it on the first deploy and writes its id into `wrangler.jsonc`.
 
 ```bash
 pnpm wrangler login
-pnpm wrangler d1 create quickstart
-```
-
-Set the production secrets. `BETTER_AUTH_URL` is the deployed origin, for example `https://quickstart.<your-subdomain>.workers.dev`:
-
-```bash
 pnpm wrangler secret put BETTER_AUTH_SECRET
-pnpm wrangler secret put BETTER_AUTH_URL
 pnpm wrangler secret put ANTHROPIC_API_KEY   # optional, for the chat example
 ```
 
@@ -70,7 +67,7 @@ pnpm run deploy
 
 ### Deploy on push with Workers Builds
 
-After the first deploy, connect the repository in the Cloudflare dashboard under **Workers & Pages → quickstart → Settings → Builds → Connect**. The Worker name must match `name` in `wrangler.jsonc`. Use these settings:
+The Deploy to Cloudflare button sets this up for you. To connect an existing deployment instead, go to the Cloudflare dashboard under **Workers & Pages → quickstart → Settings → Builds → Connect**. The Worker name must match `name` in `wrangler.jsonc`. Use these settings:
 
 | Setting         | Value                                                   |
 | --------------- | ------------------------------------------------------- |
@@ -85,10 +82,9 @@ Runtime secrets stay in **Settings → Variables & Secrets**. Build variables ar
 
 With Preview Builds enabled, every branch gets its own [Workers Preview](https://developers.cloudflare.com/workers/previews/): a production-like URL that Workers Builds comments on the pull request. Previews never touch production data. They bind `DB` to a shared staging database, configured in the `previews` block of `wrangler.jsonc` and in `wrangler.preview-migrations.jsonc`.
 
-One-time setup:
+One-time setup: give Previews their auth secret. Wrangler creates the `quickstart-preview` database the first time Preview migrations run.
 
 ```bash
-pnpm wrangler d1 create quickstart-preview   # paste the id into both files above
 pnpm wrangler preview base-config secret put BETTER_AUTH_SECRET
 ```
 

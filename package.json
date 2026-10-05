@@ -87,6 +87,16 @@
     "pnpm": ">=11.22.0"
   },
   "packageManager": "pnpm@11.22.0",
+  "cloudflare": {
+    "bindings": {
+      "BETTER_AUTH_SECRET": {
+        "description": "Signs Better Auth sessions. Generate one with `openssl rand -base64 32`."
+      },
+      "DB": {
+        "description": "D1 database for app data and auth tables. Migrations run on every deploy."
+      }
+    }
+  },
   "intent": {
     "skills": [
       "@tanstack/react-start",

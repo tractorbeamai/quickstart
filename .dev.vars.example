@@ -1,9 +1,12 @@
 # Copy to .dev.vars for local development. In production, set these with
-# `pnpm wrangler secret put <NAME>`.
+# `pnpm wrangler secret put <NAME>`. The Deploy to Cloudflare button prompts
+# for every uncommented value here.
 
 # Generate with: openssl rand -base64 32
 BETTER_AUTH_SECRET=replace-with-at-least-32-random-characters
-BETTER_AUTH_URL=http://localhost:3000
+
+# Optional: Better Auth uses the request's origin when this is unset.
+# BETTER_AUTH_URL=http://localhost:3000
 
 # Optional: only needed for the chat example.
 # ANTHROPIC_API_KEY=sk-ant-...
