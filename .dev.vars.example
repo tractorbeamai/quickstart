@@ -1,9 +1,10 @@
-# Copy to .dev.vars for local development. In production, set these with
-# `pnpm wrangler secret put <NAME>`. The Deploy to Cloudflare button prompts
-# for every uncommented value here.
+# Local secrets. `pnpm dev` copies this to .dev.vars on first run and fills in
+# BETTER_AUTH_SECRET. Deployed Workers and Previews get their own generated
+# secret from `pnpm run deploy` / `pnpm run deploy:preview`. The Deploy to
+# Cloudflare button prompts for uncommented values only, so it asks for nothing.
 
-# Generate with: openssl rand -base64 32
-BETTER_AUTH_SECRET=replace-with-at-least-32-random-characters
+# Generated automatically; set it yourself to pin a value.
+# BETTER_AUTH_SECRET=
 
 # Optional: Better Auth uses the request's origin when this is unset.
 # BETTER_AUTH_URL=http://localhost:3000

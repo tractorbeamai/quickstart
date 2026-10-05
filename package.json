@@ -12,9 +12,9 @@
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "db:push": "pnpm db:generate && pnpm db:migrate",
     "db:seed": "tsx src/db/seed.ts",
-    "deploy": "pnpm build && pnpm db:migrate:remote && wrangler deploy",
-    "deploy:preview": "pnpm build && pnpm db:migrate:preview && wrangler preview",
-    "dev": "vp dev",
+    "deploy": "pnpm build && pnpm db:migrate:remote && node scripts/deploy.mjs",
+    "deploy:preview": "pnpm build && pnpm db:migrate:preview && node scripts/deploy.mjs --preview",
+    "dev": "node scripts/dev-vars.mjs && vp dev",
     "format": "vp fmt",
     "lint": "vp lint",
     "lint:knip": "knip",
@@ -89,9 +89,6 @@
   "packageManager": "pnpm@11.22.0",
   "cloudflare": {
     "bindings": {
-      "BETTER_AUTH_SECRET": {
-        "description": "Signs Better Auth sessions. Generate one with `openssl rand -base64 32`."
-      },
       "DB": {
         "description": "D1 database for app data and auth tables. Migrations run on every deploy."
       }

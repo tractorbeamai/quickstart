@@ -32,12 +32,9 @@ A React starter for building polished demos quickly. It runs TanStack Start on C
 git clone https://github.com/tractorbeamai/quickstart.git
 cd quickstart
 pnpm install
-cp .dev.vars.example .dev.vars
 ```
 
-Set `BETTER_AUTH_SECRET` in `.dev.vars` to the output of `openssl rand -base64 32`. Uncomment `ANTHROPIC_API_KEY` if you want to use the chat example.
-
-Create the local D1 database, seed it, and start the app:
+Create the local D1 database, seed it, and start the app. The first `pnpm dev` creates `.dev.vars` with a generated `BETTER_AUTH_SECRET`; add `ANTHROPIC_API_KEY` there if you want to use the chat example.
 
 ```bash
 pnpm db:migrate
@@ -49,20 +46,14 @@ Open [http://localhost:3000](http://localhost:3000), then go to [/login](http://
 
 ### Deploy to Cloudflare
 
-**One click:** the **Deploy to Cloudflare** button above copies this repository to your GitHub or GitLab account, creates the Worker and its D1 database, asks for `BETTER_AUTH_SECRET`, and sets up Workers Builds so every push deploys and every pull request gets a Preview.
+**One click:** the **Deploy to Cloudflare** button above copies this repository to your GitHub or GitLab account, creates the Worker and its D1 database, and sets up Workers Builds so every push deploys and every pull request gets a Preview. It doesn't ask for anything: the deploy generates `BETTER_AUTH_SECRET`.
 
-**From your machine:** log in and set the secrets. The D1 database doesn't need creating; Wrangler provisions it on the first deploy and writes its id into `wrangler.jsonc`.
+**From your machine:** log in, then build, apply migrations to the remote database, and deploy. Wrangler creates the D1 database on the first deploy and writes its id into `wrangler.jsonc`. The deploy generates `BETTER_AUTH_SECRET` if the Worker doesn't have one yet, and never replaces an existing one. Use `pnpm run` here: `pnpm deploy` is a built-in pnpm command, not this script.
 
 ```bash
 pnpm wrangler login
-pnpm wrangler secret put BETTER_AUTH_SECRET
-pnpm wrangler secret put ANTHROPIC_API_KEY   # optional, for the chat example
-```
-
-Build, apply migrations to the remote database, and deploy. Use `pnpm run` here: `pnpm deploy` is a built-in pnpm command, not this script.
-
-```bash
 pnpm run deploy
+pnpm wrangler secret put ANTHROPIC_API_KEY   # optional, for the chat example
 ```
 
 ### Deploy on push with Workers Builds
@@ -72,8 +63,8 @@ The Deploy to Cloudflare button sets this up for you. To connect an existing dep
 | Setting         | Value                                                   |
 | --------------- | ------------------------------------------------------- |
 | Build command   | `pnpm build`                                            |
-| Deploy command  | `pnpm db:migrate:remote && pnpm wrangler deploy`        |
-| Preview command | `pnpm db:migrate:preview && pnpm wrangler preview`      |
+| Deploy command  | `pnpm run deploy`                                       |
+| Preview command | `pnpm run deploy:preview`                               |
 | Build variable  | `PNPM_VERSION` = `11.22.0` (the build image ships 10.x) |
 
 Runtime secrets stay in **Settings → Variables & Secrets**. Build variables are not visible to the Worker at runtime.
@@ -82,13 +73,7 @@ Runtime secrets stay in **Settings → Variables & Secrets**. Build variables ar
 
 With Preview Builds enabled, every branch gets its own [Workers Preview](https://developers.cloudflare.com/workers/previews/): a production-like URL that Workers Builds comments on the pull request. Previews never touch production data. They bind `DB` to a shared staging database, configured in the `previews` block of `wrangler.jsonc` and in `wrangler.preview-migrations.jsonc`.
 
-One-time setup: give Previews their auth secret. Wrangler creates the `quickstart-preview` database the first time Preview migrations run.
-
-```bash
-pnpm wrangler preview base-config secret put BETTER_AUTH_SECRET
-```
-
-Leave `BETTER_AUTH_URL` unset for Previews so Better Auth uses each Preview's own URL. To create a Preview from your machine instead of Workers Builds, run `pnpm run deploy:preview`.
+There's no setup: `pnpm run deploy:preview` creates the `quickstart-preview` database on first use, applies migrations, and generates a `BETTER_AUTH_SECRET` for each new Preview. Keep the Preview command set to `pnpm run deploy:preview` (not plain `wrangler preview`), or Previews start without a secret. Leave `BETTER_AUTH_URL` unset for Previews so Better Auth uses each Preview's own URL. Run `pnpm run deploy:preview` yourself to create a Preview from your machine.
 
 ## Authentication
 
