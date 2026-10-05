@@ -10,7 +10,8 @@ const config: KnipConfig = {
   ],
   ignoreExportsUsedInFile: true,
   // `cloudflare:workers` is a Workers runtime module, not an npm package.
-  ignoreDependencies: ["@tanstack/router-plugin", "cloudflare"],
+  // `@tanstack/intent` is a CLI agents run to load skills (see AGENTS.md).
+  ignoreDependencies: ["@tanstack/intent", "@tanstack/router-plugin", "cloudflare"],
 };
 
 export default config;

@@ -1,30 +1,31 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "enabledMcpjsonServers": ["docs-index"],
   "enabledPlugins": {
+    "auth-skills@better-auth-agent-skills": true,
     "cloudflare@cloudflare": true,
-    "shadcn@shadcn-ui": true
+    "code-style@tractorbeam": true,
+    "typescript-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
+    "better-auth-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "better-auth/skills"
+      }
+    },
     "cloudflare": {
       "source": {
         "source": "github",
         "repo": "cloudflare/skills"
       }
     },
-    "shadcn-ui": {
+    "tractorbeam": {
       "source": {
-        "source": "settings",
-        "name": "shadcn-ui",
-        "plugins": [
-          {
-            "name": "shadcn",
-            "source": {
-              "source": "github",
-              "repo": "shadcn-ui/ui"
-            }
-          }
-        ]
-      }
+        "source": "git",
+        "url": "https://github.com/tractorbeamai/skills.git"
+      },
+      "autoUpdate": true
     }
   }
 }

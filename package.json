@@ -66,6 +66,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.62.5",
     "@cloudflare/workers-types": "^5.20261003.1",
+    "@tanstack/intent": "^0.5.3",
     "@tractorbeam/oxfmt-config": "^0.2.0",
     "@tractorbeam/oxlint-config": "^0.4.0",
     "@vitejs/plugin-react": "^6.1.1",
@@ -79,5 +80,15 @@
     "node": "^24.11.0",
     "pnpm": ">=11.22.0"
   },
-  "packageManager": "pnpm@11.22.0"
+  "packageManager": "pnpm@11.22.0",
+  "intent": {
+    "skills": [
+      "@tanstack/react-start",
+      "@tanstack/router-core",
+      "@tanstack/router-plugin",
+      "@tanstack/start-client-core",
+      "@tanstack/start-server-core",
+      "@tanstack/virtual-file-routes"
+    ]
+  }
 }

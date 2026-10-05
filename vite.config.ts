@@ -9,6 +9,9 @@ import { defineConfig } from "vite-plus";
 const lint = oxlintConfig();
 
 const generatedPatterns = [
+  // Vendored by the `skills` CLI; edits would drift from skills-lock.json.
+  ".claude/skills/**",
+  "skills-lock.json",
   ".tanstack/**",
   ".wrangler/**",
   "migrations/meta/**",

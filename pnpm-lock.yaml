@@ -144,6 +144,9 @@ importers:
       '@cloudflare/workers-types':
         specifier: ^5.20261003.1
         version: 5.20261003.1
+      '@tanstack/intent':
+        specifier: ^0.5.3
+        version: 0.5.3
       '@tractorbeam/oxfmt-config':
         specifier: ^0.2.0
         version: 0.2.0
@@ -2349,6 +2352,11 @@ packages:
   '@tanstack/history@1.162.4':
     resolution: {integrity: sha512-utTS5L2OkeYUzXGohL1Z8sefu1GLNOJcxe8Hd6iIdc/Xo1K1nDB2JEp4iSFhvYh33xKC9V91TxrS8qfrpoKobQ==}
     engines: {node: '>=20.19'}
+
+  '@tanstack/intent@0.5.3':
+    resolution: {integrity: sha512-2zeLGRJ+796daqv3DrwXsrXn7TZb4yOIogJgrqeF96YEIwOsJoDIW/eQBwZVAcR1OQ3znA3dGDizb5GBmxk4Zg==}
+    engines: {node: '>=20.12.0'}
+    hasBin: true
 
   '@tanstack/pacer-lite@0.1.1':
     resolution: {integrity: sha512-y/xtNPNt/YeyoVxE/JCx+T7yjEzpezmbb+toK8DDD1P4m7Kzs5YR956+7OKexG3f8aXgC3rLZl7b1V+yNUSy5w==}
@@ -7142,6 +7150,8 @@ snapshots:
       '@tanstack/store': 0.11.2
 
   '@tanstack/history@1.162.4': {}
+
+  '@tanstack/intent@0.5.3': {}
 
   '@tanstack/pacer-lite@0.1.1': {}
 

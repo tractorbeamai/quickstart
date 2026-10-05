@@ -1,3 +1,17 @@
+<!-- intent-skills:start -->
+
+## Skill Loading
+
+Use the repository’s installed Intent. If it is unavailable, report the missing dependency instead of downloading a replacement. Before editing files for a substantial task:
+
+- Run `pnpm exec intent list` from the workspace root to see available local skills.
+- If a listed skill matches the task, run `pnpm exec intent load <package>#<skill>` before changing files.
+- Use the loaded `SKILL.md` guidance while making the change.
+- Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
+- Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
+
+<!-- intent-skills:end -->
+
 # Agent Instructions
 
 ## Philosophy
@@ -47,6 +61,18 @@ The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`
 ## Auth
 
 Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/example/account.tsx`. Call `router.invalidate()` after signing in or out.
+
+## Library Docs
+
+Library APIs in this stack change faster than model training data. Check current guidance before writing or debugging library-specific code. Use the most specific source first:
+
+1. **Installed skills.** TanStack Router and Start come through Intent (see Skill Loading above). Cloudflare (Workers, D1, Wrangler) and Better Auth come from the Claude Code plugins in `.claude/settings.json`. shadcn/ui and the AI SDK have no Claude Code plugin, so their skills are installed with the `skills` CLI into `.claude/skills/` and pinned in `skills-lock.json`. Update them with `npx skills update`, and add new ones with `npx skills add <owner/repo> --skill <name> --agent claude-code`. Use a Claude Code plugin instead when one exists.
+2. **`docs-index` MCP server** (`.mcp.json`). Its `context` tool searches current first-party documentation and returns a short answer with citations. Use it when:
+   - No skill covers the library: Drizzle ORM and drizzle-kit, Tailwind CSS v4, React 19, TanStack Query and Form, Zod 4, Vite+ (`vp`), Oxlint, and Oxfmt.
+   - A skill doesn't answer the question, or you need to confirm an API, config option, or CLI flag for the version in `package.json`.
+   - You're debugging an error that looks like library behavior (types, config, runtime) rather than this repo's code.
+
+   Pass the library name as `product` and ask a specific implementation question. Don't use it to search this repository; read the code instead.
 
 ## Do / Do Not
 
