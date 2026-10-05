@@ -49,7 +49,7 @@ Do not modify:
 | Bindings, secrets, Previews | `wrangler.jsonc`, `wrangler.preview-migrations.jsonc`, `.dev.vars.example` |
 | Tests and test setup | `*.test.ts` next to the code, `src/test/setup.ts`, `test` in `vite.config.ts` |
 | Lint, format, build config | `vite.config.ts` |
-| Agent hooks, plugins, MCP | `.claude/settings.json`, `.claude/hooks/`, `.mcp.json` |
+| Agent plugins and MCP | `.claude/settings.json`, `.mcp.json` |
 
 ## Commands
 
@@ -70,13 +70,11 @@ pnpm check                            # run all static checks
 
 Prove a change works before calling it done:
 
-- **Run the narrowest check first.** Use one test file or `pnpm lint <file>` while iterating, then `pnpm verify` once at the end. A Stop hook runs `pnpm verify` whenever the working tree has changes and sends failures back to you; fix them rather than working around the hook.
+- **Run the narrowest check first.** Use one test file or `pnpm lint <file>` while iterating, then `pnpm verify` once at the end. Don't finish with `pnpm verify` failing.
 - **Add or update a test** for behavior you change in `src/server/`, `src/lib/`, or `src/db/`. Tests run in workerd with a real, migrated D1 (no mocks), so call the real code: the `db` client, `auth.handler`, and so on.
 - **Inspect local data and logs** while `pnpm dev` runs through the Local Explorer API at `http://localhost:3000/cdn-cgi/local/explorer/api`. Use `GET .../d1/database` to find the local D1 and run SQL against it, and `POST .../local/observability/query` to query request traces and console logs with SQL. Fetch `.../explorer/api` for the full OpenAPI schema only if those aren't enough.
 - **Check UI changes in a browser** (for example, the `agent-browser` CLI) and include what you saw, not just "it should work".
 - **Report evidence**: the commands you ran and their results, in the final message or PR description.
-
-A PostToolUse hook formats and lints each file you edit. Re-read a file before editing it again, because the formatter may have changed it.
 
 ## Database Workflow
 

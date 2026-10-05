@@ -7,31 +7,6 @@
     "code-style@tractorbeam": true,
     "typescript-lsp@claude-plugins-official": true
   },
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|MultiEdit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit.mjs\"",
-            "timeout": 60
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/stop-verify.mjs\"",
-            "timeout": 300
-          }
-        ]
-      }
-    ]
-  },
   "extraKnownMarketplaces": {
     "better-auth-agent-skills": {
       "source": {
