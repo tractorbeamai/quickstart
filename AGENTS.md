@@ -78,13 +78,7 @@ Prove a change works before calling it done:
 
 ## Database Workflow
 
-The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`. Server code reads the `DB` binding and secrets through `cloudflare:workers`, not `process.env`.
-
-**Local development:** After changing `src/db/schema.ts`, run `pnpm db:push`. It generates a SQL migration in `migrations/` and applies it to the local D1 copy in `.wrangler/`. Commit the migration files.
-
-**Deploying:** `pnpm run deploy` (not `pnpm deploy`, which is a pnpm built-in) applies pending migrations to the remote D1 database before running `wrangler deploy`.
-
-**Previews:** each branch or pull request gets a Workers Preview whose `DB` is a shared staging database (`previews` in `wrangler.jsonc`), never production. `pnpm run deploy:preview` migrates that database and deploys a Preview for the current branch.
+The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`. After changing `src/db/schema.ts`, run `pnpm db:push`: it generates a SQL migration in `migrations/` and applies it to the local D1 copy in `.wrangler/`. Commit the migration files. Deploys and Previews apply them remotely; Previews use a shared staging database, never production.
 
 ## Auth
 
@@ -129,10 +123,4 @@ When an agent gets something wrong in a way a rule or script would have prevente
 
 ## Finding Patterns
 
-See README.md for:
-
-- Project structure
-- Full command reference
-- Code patterns (routing, server functions, state, AI)
-
-See `src/routes/example/` for working reference implementations.
+See README.md for project structure, deployment, and the full command list, and `src/routes/example/` for working reference implementations.

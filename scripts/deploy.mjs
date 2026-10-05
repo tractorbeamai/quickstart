@@ -1,41 +1,41 @@
-// Deploy the Worker (or a Preview with --preview), generating any missing
-// secrets on the way. A secret that already exists is never replaced, so
-// redeploys don't rotate BETTER_AUTH_SECRET and sign everyone out.
+// Build, migrate D1, and deploy the Worker (or a Preview with --preview).
+// Generates BETTER_AUTH_SECRET if the target doesn't have one yet, and never
+// replaces an existing one, so redeploys don't sign everyone out.
 // Usage: node scripts/deploy.mjs [--preview]
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const GENERATED_SECRETS = ["BETTER_AUTH_SECRET"];
-
 const preview = process.argv.includes("--preview");
-const wrangler = (args, options) => spawnSync("pnpm", ["exec", "wrangler", ...args], options);
+const run = (args) => execFileSync("pnpm", args, { stdio: "inherit" });
 
-// Listing fails before the first deploy of a Worker or Preview; every secret
-// counts as missing then.
-const listing = wrangler(preview ? ["preview", "secret", "list", "--json"] : ["secret", "list"], {
-  encoding: "utf8",
-});
-const existing = listing.status === 0 ? listing.stdout : "";
-const missing = GENERATED_SECRETS.filter((name) => !existing.includes(`"${name}"`));
+// Workers Builds runs the build command before this deploy command.
+if (!process.env.WORKERS_CI) {
+  run(["build"]);
+}
+run([preview ? "db:migrate:preview" : "db:migrate:remote"]);
 
-const deployArgs = preview ? ["preview"] : ["deploy"];
-let secretsDir;
-if (missing.length > 0) {
-  secretsDir = mkdtempSync(join(tmpdir(), "quickstart-secrets-"));
-  const secretsFile = join(secretsDir, "secrets.json");
-  const secrets = Object.fromEntries(
-    missing.map((name) => [name, randomBytes(32).toString("base64")]),
-  );
-  writeFileSync(secretsFile, JSON.stringify(secrets), { mode: 0o600 });
-  deployArgs.push("--secrets-file", secretsFile);
-  console.log(`Generating ${missing.join(", ")} for this ${preview ? "Preview" : "Worker"}.`);
+// Listing fails before a Worker or Preview's first deploy; treat that as missing.
+const listing = spawnSync(
+  "pnpm",
+  ["exec", "wrangler", ...(preview ? ["preview", "secret", "list", "--json"] : ["secret", "list"])],
+  { encoding: "utf8" },
+);
+const hasSecret = listing.status === 0 && listing.stdout.includes('"BETTER_AUTH_SECRET"');
+
+const deploy = ["exec", "wrangler", preview ? "preview" : "deploy"];
+const secretsFile = join(tmpdir(), `quickstart-secrets-${process.pid}.json`);
+if (!hasSecret) {
+  const secret = randomBytes(32).toString("base64");
+  writeFileSync(secretsFile, JSON.stringify({ BETTER_AUTH_SECRET: secret }), { mode: 0o600 });
+  deploy.push("--secrets-file", secretsFile);
+  console.log(`Generating BETTER_AUTH_SECRET for this ${preview ? "Preview" : "Worker"}.`);
 }
 
-const result = wrangler(deployArgs, { stdio: "inherit" });
-if (secretsDir) {
-  rmSync(secretsDir, { recursive: true, force: true });
+try {
+  run(deploy);
+} finally {
+  rmSync(secretsFile, { force: true });
 }
-process.exit(result.status ?? 1);

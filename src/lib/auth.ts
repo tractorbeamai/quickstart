@@ -13,6 +13,11 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  // The root route checks the session on every navigation; a signed cookie
+  // answers that without a D1 read for up to five minutes.
+  session: {
+    cookieCache: { enabled: true, maxAge: 5 * 60 },
+  },
   // Must stay last so cookies set by other plugins reach TanStack Start.
   plugins: [tanstackStartCookies()],
 });

@@ -32,10 +32,13 @@ describe("email and password auth", () => {
     const cookie = sessionCookie(signIn);
     expect(cookie).toBeDefined();
 
-    const session = await auth.api.getSession({
-      headers: new Headers({ cookie: cookie?.split(";")[0] ?? "" }),
-    });
-    expect(session?.user.email).toBe(credentials.email);
+    const session = await auth.handler(
+      new Request(`${origin}/api/auth/get-session`, {
+        headers: { cookie: cookie?.split(";")[0] ?? "" },
+      }),
+    );
+    const body: { user?: { email: string } } | null = await session.json();
+    expect(body?.user?.email).toBe(credentials.email);
   });
 
   it("rejects a wrong password", async () => {

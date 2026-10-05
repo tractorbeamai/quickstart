@@ -1,15 +1,13 @@
-// Create .dev.vars from .dev.vars.example on first `pnpm dev`, with a freshly
+// Create .dev.vars from .dev.vars.example on first `pnpm dev`, adding a
 // generated BETTER_AUTH_SECRET. Leaves an existing .dev.vars untouched.
 import { randomBytes } from "node:crypto";
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 if (!existsSync(".dev.vars")) {
-  copyFileSync(".dev.vars.example", ".dev.vars");
-  const secret = randomBytes(32).toString("base64");
-  const vars = readFileSync(".dev.vars", "utf8").replace(
-    /^# BETTER_AUTH_SECRET=.*$/mu,
-    `BETTER_AUTH_SECRET=${secret}`,
-  );
+  let vars = readFileSync(".dev.vars.example", "utf8");
+  if (!/^BETTER_AUTH_SECRET=./mu.test(vars)) {
+    vars += `\nBETTER_AUTH_SECRET=${randomBytes(32).toString("base64")}\n`;
+  }
   writeFileSync(".dev.vars", vars);
   console.log("Created .dev.vars with a generated BETTER_AUTH_SECRET.");
 }

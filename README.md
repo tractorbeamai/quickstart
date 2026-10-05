@@ -46,9 +46,9 @@ Open [http://localhost:3000](http://localhost:3000), then go to [/login](http://
 
 ### Deploy to Cloudflare
 
-**One click:** the **Deploy to Cloudflare** button above copies this repository to your GitHub or GitLab account, creates the Worker and its D1 database, and sets up Workers Builds so every push deploys and every pull request gets a Preview. It doesn't ask for anything: the deploy generates `BETTER_AUTH_SECRET`.
+The **Deploy to Cloudflare** button above copies this repository to your GitHub or GitLab account, creates the Worker and its D1 database, and sets up Workers Builds so every push deploys and every pull request gets a Preview. It asks for nothing.
 
-**From your machine:** log in, then build, apply migrations to the remote database, and deploy. Wrangler creates the D1 database on the first deploy and writes its id into `wrangler.jsonc`. The deploy generates `BETTER_AUTH_SECRET` if the Worker doesn't have one yet, and never replaces an existing one. Use `pnpm run` here: `pnpm deploy` is a built-in pnpm command, not this script.
+To deploy from your machine instead, run `pnpm run deploy` (`pnpm deploy` is a pnpm built-in). It builds, applies migrations, and deploys. Wrangler creates the D1 database on the first deploy, and the deploy generates `BETTER_AUTH_SECRET` if the Worker doesn't have one yet; an existing secret is never replaced.
 
 ```bash
 pnpm wrangler login
@@ -56,9 +56,9 @@ pnpm run deploy
 pnpm wrangler secret put ANTHROPIC_API_KEY   # optional, for the chat example
 ```
 
-### Deploy on push with Workers Builds
+### Workers Builds
 
-The Deploy to Cloudflare button sets this up for you. To connect an existing deployment instead, go to the Cloudflare dashboard under **Workers & Pages → quickstart → Settings → Builds → Connect**. The Worker name must match `name` in `wrangler.jsonc`. Use these settings:
+To connect an existing Worker yourself, go to **Workers & Pages → quickstart → Settings → Builds → Connect** in the Cloudflare dashboard. The Worker name must match `name` in `wrangler.jsonc`. Use these settings:
 
 | Setting         | Value                                                   |
 | --------------- | ------------------------------------------------------- |
@@ -67,13 +67,11 @@ The Deploy to Cloudflare button sets this up for you. To connect an existing dep
 | Preview command | `pnpm run deploy:preview`                               |
 | Build variable  | `PNPM_VERSION` = `11.22.0` (the build image ships 10.x) |
 
-Runtime secrets stay in **Settings → Variables & Secrets**. Build variables are not visible to the Worker at runtime.
+The deploy script skips its own build under Workers Builds, so each push builds once. Runtime secrets live in **Settings → Variables & Secrets**; build variables aren't visible to the Worker.
 
-### Preview every pull request
+### Previews
 
-With Preview Builds enabled, every branch gets its own [Workers Preview](https://developers.cloudflare.com/workers/previews/): a production-like URL that Workers Builds comments on the pull request. Previews never touch production data. They bind `DB` to a shared staging database, configured in the `previews` block of `wrangler.jsonc` and in `wrangler.preview-migrations.jsonc`.
-
-There's no setup: `pnpm run deploy:preview` creates the `quickstart-preview` database on first use, applies migrations, and generates a `BETTER_AUTH_SECRET` for each new Preview. Keep the Preview command set to `pnpm run deploy:preview` (not plain `wrangler preview`), or Previews start without a secret. Leave `BETTER_AUTH_URL` unset for Previews so Better Auth uses each Preview's own URL. Run `pnpm run deploy:preview` yourself to create a Preview from your machine.
+Each branch gets a [Workers Preview](https://developers.cloudflare.com/workers/previews/), a production-like URL that Workers Builds comments on the pull request. Previews bind `DB` to a shared `quickstart-preview` database (the `previews` block in `wrangler.jsonc`, plus `wrangler.preview-migrations.jsonc`), never production. Keep the Preview command as `pnpm run deploy:preview`, not plain `wrangler preview`: it migrates that database and gives each new Preview its own `BETTER_AUTH_SECRET`. Run it yourself to preview the current branch.
 
 ## Authentication
 

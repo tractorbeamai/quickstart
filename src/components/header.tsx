@@ -25,10 +25,6 @@ export default function Header() {
         <div className="px-2 font-bold">
           <Link to="/example/posts">Posts</Link>
         </div>
-
-        <div className="px-2 font-bold">
-          <Link to="/example/account">Account</Link>
-        </div>
       </nav>
 
       <div className="px-2 text-sm">
