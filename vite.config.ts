@@ -68,6 +68,10 @@ export default defineConfig({
   ssr: {
     noExternal: ["streamdown"],
   },
+  // Vite leaves server builds unminified; minify the Worker to halve its size.
+  environments: {
+    ssr: { build: { minify: true } },
+  },
   test: {
     projects: [
       {

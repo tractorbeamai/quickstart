@@ -19,10 +19,18 @@ if (!process.env.WORKERS_CI) {
 
 // `wrangler deploy` provisions a missing D1 database, but migrations run
 // first and don't, so create it on a first deploy from a fresh account.
+// Only create when the listing succeeds and lacks it; a failed listing
+// (transient API error) must not be mistaken for a missing database.
 const config = preview ? "wrangler.preview-migrations.jsonc" : "wrangler.jsonc";
 const database = unstable_readConfig({ config }).d1_databases[0]?.database_name;
-if (database && spawnSync("pnpm", ["exec", "wrangler", "d1", "info", database]).status !== 0) {
-  run(["exec", "wrangler", "d1", "create", database, "--no-update-config"]);
+if (database) {
+  const databases = execFileSync("pnpm", ["exec", "wrangler", "d1", "list", "--json"], {
+    encoding: "utf8",
+  });
+  const names = JSON.parse(databases.slice(databases.indexOf("["))).map((d) => d.name);
+  if (!names.includes(database)) {
+    run(["exec", "wrangler", "d1", "create", database, "--no-update-config"]);
+  }
 }
 run([preview ? "db:migrate:preview" : "db:migrate:remote"]);
 
