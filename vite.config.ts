@@ -56,14 +56,6 @@ export default defineConfig({
       // Default in the next @tractorbeam/oxlint-config release; drop once on it.
       "no-nested-ternary": "error",
     },
-    overrides: [
-      {
-        files: ["src/db/seed.ts"],
-        rules: {
-          "no-await-in-loop": "off",
-        },
-      },
-    ],
   },
   ssr: {
     noExternal: ["streamdown"],

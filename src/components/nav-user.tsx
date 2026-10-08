@@ -1,7 +1,5 @@
-import { useCallback } from "react";
-import { Link, useNavigate, useRouteContext, useRouter } from "@tanstack/react-router";
+import { Link, useRouteContext } from "@tanstack/react-router";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,20 +15,14 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
+import { UserAvatar } from "@/components/user-avatar";
+import { useSignOut } from "@/hooks/use-session-change";
 import { BadgeCheckIcon, ChevronsUpDownIcon, LogInIcon, LogOutIcon } from "lucide-react";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { session } = useRouteContext({ from: "__root__" });
-  const navigate = useNavigate();
-  const router = useRouter();
-
-  const handleSignOut = useCallback(async () => {
-    await authClient.signOut();
-    await router.invalidate();
-    await navigate({ to: "/login" });
-  }, [navigate, router]);
+  const handleSignOut = useSignOut();
 
   if (!session) {
     return (
@@ -46,7 +38,6 @@ export function NavUser() {
   }
 
   const { user } = session;
-  const initials = user.name.slice(0, 2).toUpperCase();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -54,10 +45,7 @@ export function NavUser() {
           <DropdownMenuTrigger
             render={<SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />}
           >
-            <Avatar>
-              {user.image ? <AvatarImage src={user.image} alt={user.name} /> : null}
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
+            <UserAvatar user={user} />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
               <span className="truncate text-xs">{user.email}</span>
@@ -73,10 +61,7 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar>
-                    {user.image ? <AvatarImage src={user.image} alt={user.name} /> : null}
-                    <AvatarFallback>{initials}</AvatarFallback>
-                  </Avatar>
+                  <UserAvatar user={user} />
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
                     <span className="truncate text-xs">{user.email}</span>

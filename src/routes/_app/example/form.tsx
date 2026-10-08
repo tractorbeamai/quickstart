@@ -1,5 +1,3 @@
-"use client";
-
 import { FormEvent, useCallback } from "react";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
@@ -67,7 +65,7 @@ function FormPage() {
   const handleReset = useCallback(() => form.reset(), [form]);
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl justify-center py-8">
+    <div className="flex justify-center">
       <Card className="w-full sm:max-w-md">
         <CardHeader>
           <CardTitle>Bug Report</CardTitle>
@@ -157,6 +155,6 @@ function FormPage() {
           </Field>
         </CardFooter>
       </Card>
-    </main>
+    </div>
   );
 }

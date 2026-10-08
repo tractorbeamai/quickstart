@@ -11,6 +11,9 @@ import { unstable_readConfig } from "wrangler";
 
 const preview = process.argv.includes("--preview");
 const run = (args) => execFileSync("pnpm", args, { stdio: "inherit" });
+// `pnpm run` puts node_modules/.bin on PATH, so call wrangler directly for
+// clean stdout (no pnpm banner in front of JSON output).
+const wrangler = (args) => spawnSync("wrangler", args, { encoding: "utf8" });
 
 // Workers Builds runs the build command before this deploy command.
 if (!process.env.WORKERS_CI) {
@@ -24,23 +27,21 @@ if (!process.env.WORKERS_CI) {
 const config = preview ? "wrangler.preview-migrations.jsonc" : "wrangler.jsonc";
 const database = unstable_readConfig({ config }).d1_databases[0]?.database_name;
 if (database) {
-  const databases = execFileSync("pnpm", ["exec", "wrangler", "d1", "list", "--json"], {
-    encoding: "utf8",
-  });
-  const names = JSON.parse(databases.slice(databases.indexOf("["))).map((d) => d.name);
-  if (!names.includes(database)) {
+  const listing = wrangler(["d1", "list", "--json"]);
+  if (listing.status !== 0) {
+    throw new Error(`wrangler d1 list failed:\n${listing.stderr}`);
+  }
+  if (!JSON.parse(listing.stdout).some((d) => d.name === database)) {
     run(["exec", "wrangler", "d1", "create", database, "--no-update-config"]);
   }
 }
 run([preview ? "db:migrate:preview" : "db:migrate:remote"]);
 
 // Listing fails before a Worker or Preview's first deploy; treat that as missing.
-const listing = spawnSync(
-  "pnpm",
-  ["exec", "wrangler", ...(preview ? ["preview", "secret", "list", "--json"] : ["secret", "list"])],
-  { encoding: "utf8" },
+const secrets = wrangler(
+  preview ? ["preview", "secret", "list", "--json"] : ["secret", "list", "--format", "json"],
 );
-const hasSecret = listing.status === 0 && listing.stdout.includes('"BETTER_AUTH_SECRET"');
+const hasSecret = secrets.status === 0 && secrets.stdout.includes('"BETTER_AUTH_SECRET"');
 
 const deploy = ["exec", "wrangler", preview ? "preview" : "deploy"];
 const secretsFile = join(tmpdir(), `quickstart-secrets-${process.pid}.json`);

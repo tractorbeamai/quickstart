@@ -15,7 +15,7 @@ import { listPostsQueryOptions } from "@/server/posts";
 
 export const Route = createFileRoute("/_app/example/posts/")({
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(listPostsQueryOptions());
+    await context.queryClient.query({ ...listPostsQueryOptions(), staleTime: "static" });
   },
   component: PostsIndex,
 });
@@ -24,15 +24,12 @@ function PostsIndex() {
   const { data: posts } = useSuspenseQuery(listPostsQueryOptions());
 
   return (
-    <div className="mx-auto w-full max-w-5xl py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Posts</h1>
-          <p className="text-muted-foreground">
-            Manage your blog posts with Drizzle ORM + Server Functions
-          </p>
-        </div>
-        <Button>New Post</Button>
+    <div>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Posts</h1>
+        <p className="text-muted-foreground">
+          Read from D1 with Drizzle ORM and a TanStack Start server function
+        </p>
       </div>
 
       <div className="rounded-md border">

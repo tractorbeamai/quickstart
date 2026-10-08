@@ -42,7 +42,7 @@ Do not modify:
 
 | Task | Start in |
 | --- | --- |
-| Add or change a page | `src/routes/_app/` (inside the sidebar layout) or `src/routes/` (full-screen); add nav links to `navMain` in `src/components/app-sidebar.tsx` |
+| Add or change a page | `src/routes/_app/` (inside the sidebar layout, which already provides the centered `max-w-5xl` page container; don't add your own) or `src/routes/` (full-screen); add nav links to `navMain` in `src/components/app-sidebar.tsx` |
 | Read or write data from the UI | `src/server/` server functions + TanStack Query options |
 | Change tables | `src/db/schema.ts`, then `pnpm db:push` |
 | Auth behavior or protected routes | `src/lib/auth.ts`, `src/routes/__root.tsx`, `src/routes/_app/example/account.tsx` |
@@ -82,7 +82,7 @@ The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`
 
 ## Auth
 
-Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/_app/example/account.tsx`. Call `router.invalidate()` after signing in or out.
+Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/_app/example/account.tsx`. After signing in, call `useSessionChange()` (not `router.invalidate()`); sign out with `useSignOut()`. Both live in `src/hooks/use-session-change.ts` and clear the cached session query.
 
 ## Library Docs
 

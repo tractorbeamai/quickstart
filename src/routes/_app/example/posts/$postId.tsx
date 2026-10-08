@@ -8,7 +8,10 @@ import { findPostByIdQueryOptions } from "@/server/posts";
 
 export const Route = createFileRoute("/_app/example/posts/$postId")({
   loader: async ({ params: { postId }, context }) => {
-    await context.queryClient.ensureQueryData(findPostByIdQueryOptions({ id: Number(postId) }));
+    await context.queryClient.query({
+      ...findPostByIdQueryOptions({ id: Number(postId) }),
+      staleTime: "static",
+    });
   },
   component: PostDetail,
 });
@@ -19,22 +22,20 @@ function PostDetail() {
 
   if (!post) {
     return (
-      <div className="mx-auto w-full max-w-5xl py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Post Not Found</CardTitle>
-            <CardDescription>The post you're looking for doesn't exist.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button render={<Link to="/example/posts" />}>Back to Posts</Button>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Post Not Found</CardTitle>
+          <CardDescription>The post you're looking for doesn't exist.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button render={<Link to="/example/posts" />}>Back to Posts</Button>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl py-8">
+    <div>
       <div className="mb-4">
         <Button variant="ghost" render={<Link to="/example/posts" />}>
           &larr; Back to Posts
@@ -75,11 +76,6 @@ function PostDetail() {
               <span className="font-medium">Updated:</span>{" "}
               {new Date(post.updatedAt).toLocaleString()}
             </div>
-          </div>
-
-          <div className="flex gap-2 border-t pt-6">
-            <Button variant="outline">Edit</Button>
-            <Button variant="outline">Delete</Button>
           </div>
         </CardContent>
       </Card>

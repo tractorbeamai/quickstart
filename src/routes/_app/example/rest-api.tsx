@@ -36,43 +36,41 @@ function TanStackQueryDemo() {
   });
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Star Wars characters</CardTitle>
-          <CardDescription>
-            Fetched in the browser from the public SWAPI REST API with TanStack Query.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Height (cm)</TableHead>
-                <TableHead>Birth year</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isPending
-                ? skeletonRows.map((row) => (
-                    <TableRow key={row}>
-                      <TableCell colSpan={3}>
-                        <Skeleton className="h-5 w-full" />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                : people?.map((person) => (
-                    <TableRow key={person.name}>
-                      <TableCell className="font-medium">{person.name}</TableCell>
-                      <TableCell>{person.height}</TableCell>
-                      <TableCell>{person.birth_year}</TableCell>
-                    </TableRow>
-                  ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </main>
+    <Card>
+      <CardHeader>
+        <CardTitle>Star Wars characters</CardTitle>
+        <CardDescription>
+          Fetched in the browser from the public SWAPI REST API with TanStack Query.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Height (cm)</TableHead>
+              <TableHead>Birth year</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isPending
+              ? skeletonRows.map((row) => (
+                  <TableRow key={row}>
+                    <TableCell colSpan={3}>
+                      <Skeleton className="h-5 w-full" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              : people?.map((person) => (
+                  <TableRow key={person.name}>
+                    <TableCell className="font-medium">{person.name}</TableCell>
+                    <TableCell>{person.height}</TableCell>
+                    <TableCell>{person.birth_year}</TableCell>
+                  </TableRow>
+                ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

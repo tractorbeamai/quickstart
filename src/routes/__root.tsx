@@ -6,15 +6,17 @@ import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanst
 
 import { Toaster } from "@/components/ui/toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { getSession } from "@/server/auth";
+import { sessionQueryOptions } from "@/server/auth";
 import appCss from "@/styles.css?url";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
-  // Every route sees `session` in its context. Call router.invalidate() after
-  // signing in or out to refresh it.
-  beforeLoad: async () => ({ session: await getSession() }),
+  // Every route sees `session` in its context. After signing in or out, use
+  // useSessionChange (src/hooks/use-session-change.ts) to refresh it.
+  beforeLoad: async ({ context }) => ({
+    session: await context.queryClient.query(sessionQueryOptions),
+  }),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
