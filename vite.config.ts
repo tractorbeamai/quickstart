@@ -56,19 +56,12 @@ export default defineConfig({
       // Default in the next @tractorbeam/oxlint-config release; drop once on it.
       "no-nested-ternary": "error",
     },
-    overrides: [
-      {
-        files: ["src/db/seed.ts"],
-        rules: {
-          "no-await-in-loop": "off",
-        },
-      },
-    ],
   },
   ssr: {
     noExternal: ["streamdown"],
   },
-  // Vite leaves server builds unminified; minify the Worker to halve its size.
+  // Vite leaves server builds unminified by default; minify the Worker bundle,
+  // since its compressed size counts against Cloudflare's script size limit.
   environments: {
     ssr: { build: { minify: true } },
   },

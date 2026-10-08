@@ -1,4 +1,4 @@
-import { anthropic } from "@ai-sdk/anthropic";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   convertToModelMessages,
@@ -8,10 +8,16 @@ import {
   type UIMessage,
 } from "ai";
 
+import { env } from "@/lib/env-server";
+
 export const Route = createFileRoute("/example/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        if (!env.ANTHROPIC_API_KEY) {
+          return new Response("Set ANTHROPIC_API_KEY to use the chat example.", { status: 500 });
+        }
+        const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY });
         const { messages }: { messages: UIMessage[] } = await request.json();
 
         const result = streamText({

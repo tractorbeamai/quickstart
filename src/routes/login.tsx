@@ -1,6 +1,6 @@
 import { FormEvent, useCallback, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
+import { useSessionChange } from "@/hooks/use-session-change";
 import { authClient } from "@/lib/auth-client";
 
 type Mode = "sign-in" | "sign-up";
@@ -32,8 +33,7 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const { redirect } = Route.useSearch();
-  const navigate = useNavigate();
-  const router = useRouter();
+  const sessionChange = useSessionChange();
   const [mode, setMode] = useState<Mode>("sign-in");
   const isSignUp = mode === "sign-up";
   const submitLabel = isSignUp ? "Create account" : "Sign in";
@@ -55,9 +55,7 @@ function LoginPage() {
         return;
       }
 
-      // Re-run beforeLoad checks so protected routes see the new session.
-      await router.invalidate();
-      await navigate({ to: redirect ?? "/example/account" });
+      await sessionChange(redirect ?? "/example/account");
     },
   });
 
