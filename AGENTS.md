@@ -82,7 +82,7 @@ The database is Cloudflare D1 (SQLite), so schemas use `drizzle-orm/sqlite-core`
 
 ## Auth
 
-Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/_app/example/account.tsx`. After signing in, call `useSessionChange()` (not `router.invalidate()`); sign out with `useSignOut()`. Both live in `src/hooks/use-session-change.ts` and clear the cached session query.
+Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (browser). The root route puts the session in route context. Protect a route by checking `context.session` in `beforeLoad`; see `src/routes/_app/example/account.tsx`. After signing in, call `useSessionChange()`; sign out with `useSignOut()`. Both live in `src/hooks/use-session-change.ts` and clear the cached session query, which `router.invalidate()` alone would keep serving.
 
 ## Library Docs
 
@@ -109,7 +109,7 @@ Claude Code and Codex get the same instructions, skills, plugins, and MCP server
 
 - **Plugins:** `auth-skills@better-auth-agent-skills` and `code-style@tractorbeam` work in both agents under the same names. `typescript-lsp` is Claude Code only.
 - **Skills without a plugin:** install for both agents with `npx skills add <owner/repo> --skill <name> --agent claude-code codex`. `.agents/skills/` holds the only copy; `.claude/skills/<name>` is a symlink to `../../.agents/skills/<name>`, and the lock is `skills-lock.json`. Never pass `--copy` or commit a real directory under `.claude/skills/`. Update with `npx skills update`. Prefer a plugin when one exists.
-- **Cloudflare:** the `cloudflare/skills` plugin can't drop individual skills, so its skills come through the `skills` CLI instead, minus the Sandbox, Next.js, and Turnstile ones, and its MCP server (`cloudflare`) is configured directly.
+- **Cloudflare:** skills come from `cloudflare/skills` through the `skills` CLI, which can install a subset; the Sandbox, Next.js, and Turnstile skills are left out because they don't apply to this app. Its MCP server (`cloudflare`) is configured directly.
 - **MCP servers:** `cloudflare` (Cloudflare API, OAuth on first use) and `docs-index`.
 - **Codex first run:** trust the project, then run `codex plugin marketplace upgrade` once to fetch the marketplaces in `.codex/config.toml`.
 
