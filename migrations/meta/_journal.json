@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1791164069826,
-      "tag": "0000_soft_donald_blake",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1791428981167,
-      "tag": "0001_wooden_wolverine",
+      "when": 1791430681506,
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]

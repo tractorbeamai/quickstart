@@ -1,29 +1,3 @@
-CREATE TABLE `candidates` (
-	`id` text PRIMARY KEY NOT NULL,
-	`email` text NOT NULL,
-	`first_name` text,
-	`last_name` text,
-	`resume_text` text,
-	`resume_file_name` text,
-	`ai_score` integer,
-	`ai_analysis` text,
-	`qualified` integer,
-	`status` text DEFAULT 'new',
-	`pipeline_stage` text DEFAULT 'new_submissions',
-	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)),
-	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer))
-);
---> statement-breakpoint
-CREATE TABLE `intake_responses` (
-	`id` text PRIMARY KEY NOT NULL,
-	`candidate_id` text NOT NULL,
-	`question_key` text NOT NULL,
-	`question_text` text NOT NULL,
-	`response` text NOT NULL,
-	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)),
-	FOREIGN KEY (`candidate_id`) REFERENCES `candidates`(`id`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
 CREATE TABLE `posts` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`title` text NOT NULL,
