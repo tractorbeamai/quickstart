@@ -72,24 +72,18 @@ export default defineConfig({
         // workerd with only the Workers test integration loaded.
         resolve: { tsconfigPaths: true },
         plugins: [
-          cloudflareTest(async () => {
-            // Match wrangler.jsonc's runtime and D1 bindings. Its `main` only
-            // exists inside a TanStack Start build, so pass the settings
-            // through instead of `wrangler.configPath`.
-            const { unstable_readConfig } = await import("wrangler");
-            const worker = unstable_readConfig({ config: "./wrangler.jsonc" });
-            return {
-              miniflare: {
-                compatibilityDate: worker.compatibility_date,
-                compatibilityFlags: worker.compatibility_flags,
-                d1Databases: worker.d1_databases.map(({ binding }: { binding: string }) => binding),
-                bindings: {
-                  BETTER_AUTH_SECRET: "test-secret-at-least-32-characters-long",
-                  TEST_MIGRATIONS: await readD1Migrations("migrations"),
-                },
+          cloudflareTest(async () => ({
+            wrangler: { configPath: "./wrangler.jsonc" },
+            // wrangler.jsonc's `main` only resolves inside the app build.
+            main: "./src/test/worker.ts",
+            // Override .dev.vars so tests behave the same locally and in CI.
+            miniflare: {
+              bindings: {
+                BETTER_AUTH_SECRET: "test-secret-at-least-32-characters-long",
+                TEST_MIGRATIONS: await readD1Migrations("migrations"),
               },
-            };
-          }),
+            },
+          })),
         ],
         test: {
           name: "workers",
