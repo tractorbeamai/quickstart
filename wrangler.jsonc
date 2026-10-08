@@ -11,7 +11,6 @@
     {
       "binding": "DB",
       "database_name": "quickstart",
-      "migrations_dir": "migrations",
     },
   ],
   "observability": {
