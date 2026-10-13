@@ -4,9 +4,6 @@
 [mcp_servers.cloudflare]
 url = "https://mcp.cloudflare.com/mcp"
 
-[mcp_servers.docs-index]
-url = "https://index.mintlify.com/mcp"
-
 [marketplaces.better-auth-agent-skills]
 source_type = "git"
 source = "https://github.com/better-auth/skills.git"
