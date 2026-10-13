@@ -89,12 +89,12 @@ Better Auth lives in `src/lib/auth.ts` (server) and `src/lib/auth-client.ts` (br
 Library APIs in this stack change faster than model training data. Check current guidance before writing or debugging library-specific code. Use the most specific source first:
 
 1. **Installed skills.** TanStack Router and Start come through Intent (see Skill Loading above). Better Auth comes from a plugin, and Cloudflare (Workers, D1, Wrangler), shadcn/ui, and the AI SDK from `.agents/skills/` (see Agent Setup below).
-2. **`docs-index` MCP server.** Its `context` tool searches current first-party documentation and returns a short answer with citations. Use it when:
+2. **Context7 MCP tools, when your agent has them.** They return current, version-specific documentation for most libraries. Use them when:
    - No skill covers the library: Drizzle ORM and drizzle-kit, Tailwind CSS v4, React 19, TanStack Query and Form, Zod 4, Vite+ (`vp`), Oxlint, and Oxfmt.
    - A skill doesn't answer the question, or you need to confirm an API, config option, or CLI flag for the version in `package.json`.
    - You're debugging an error that looks like library behavior (types, config, runtime) rather than this repo's code.
 
-   Pass the library name as `product` and ask a specific implementation question. Don't use it to search this repository; read the code instead.
+   Ask a specific implementation question about one library at a time. Don't use them to search this repository; read the code instead.
 
 ## Agent Setup
 
@@ -110,7 +110,7 @@ Claude Code and Codex get the same instructions, skills, plugins, and MCP server
 - **Plugins:** `auth-skills@better-auth-agent-skills` and `code-style@tractorbeam` work in both agents under the same names. `typescript-lsp` is Claude Code only.
 - **Skills without a plugin:** install for both agents with `npx skills add <owner/repo> --skill <name> --agent claude-code codex`. `.agents/skills/` holds the only copy; `.claude/skills/<name>` is a symlink to `../../.agents/skills/<name>`, and the lock is `skills-lock.json`. Never pass `--copy` or commit a real directory under `.claude/skills/`. Update with `npx skills update`. Prefer a plugin when one exists.
 - **Cloudflare:** skills come from `cloudflare/skills` through the `skills` CLI, which can install a subset; the Sandbox, Next.js, and Turnstile skills are left out because they don't apply to this app. Its MCP server (`cloudflare`) is configured directly.
-- **MCP servers:** `cloudflare` (Cloudflare API, OAuth on first use) and `docs-index`.
+- **MCP servers:** `cloudflare` (Cloudflare API, OAuth on first use). Context7 isn't configured here; each agent gets it from its own Context7 connector or plugin.
 - **Codex first run:** trust the project, then run `codex plugin marketplace upgrade` once to fetch the marketplaces in `.codex/config.toml`.
 
 ## Do / Do Not
