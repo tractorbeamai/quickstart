@@ -53,8 +53,6 @@ export default defineConfig({
       ...lint.rules,
       "import/no-namespace": ["error", { ignore: ["@/db/schema"] }],
       "no-console": "off",
-      // Default in the next @tractorbeam/oxlint-config release; drop once on it.
-      "no-nested-ternary": "error",
     },
   },
   ssr: {
