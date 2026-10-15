@@ -10,7 +10,6 @@
     {
       "binding": "PREVIEW_DB",
       "database_name": "quickstart-preview",
-      "migrations_dir": "migrations",
     },
   ],
 }
