@@ -81,9 +81,9 @@
   },
   "engines": {
     "node": "^24.11.0",
-    "pnpm": ">=12.11.2"
+    "pnpm": ">=12.13.0"
   },
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.13.0",
   "cloudflare": {
     "bindings": {
       "DB": {
