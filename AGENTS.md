@@ -47,7 +47,7 @@ Do not modify:
 | Change tables | `src/db/schema.ts`, then `pnpm db:push` |
 | Auth behavior or protected routes | `src/lib/auth.ts`, `src/routes/__root.tsx`, `src/routes/_app/example/account.tsx` |
 | Bindings, secrets, Previews | `wrangler.jsonc`, `wrangler.preview-migrations.jsonc`, `.dev.vars.example` |
-| Tests and test setup | `*.test.ts` next to the code, `src/test/setup.ts`, `test` in `vite.config.ts` |
+| Tests and test setup | `*.test.ts` next to the code (import from `vite-plus/test`), `src/test/`, `test` in `vite.config.ts`; tests get wrangler.jsonc's bindings |
 | Lint, format, build config | `vite.config.ts` |
 | Agent skills, plugins, and MCP | See Agent Setup below |
 
