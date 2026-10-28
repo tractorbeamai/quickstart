@@ -55,9 +55,6 @@ export default defineConfig({
       "no-console": "off",
     },
   },
-  ssr: {
-    noExternal: ["streamdown"],
-  },
   // Vite leaves server builds unminified by default; minify the Worker bundle,
   // since its compressed size counts against Cloudflare's script size limit.
   environments: {
