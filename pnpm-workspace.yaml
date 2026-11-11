@@ -1,5 +1,8 @@
+configDependencies:
+  "@tractorbeam/pnpm-plugin-tractorbeam-defaults": latest
+minimumReleaseAgeExclude:
+  - "@tractorbeam/pnpm-plugin-tractorbeam-defaults"
 allowBuilds:
-  esbuild: true
   lightningcss: true
   msw: false
   unrs-resolver: true
