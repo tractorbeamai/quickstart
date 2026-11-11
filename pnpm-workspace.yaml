@@ -1,11 +1,8 @@
-# Cloudflare publishes these packages almost daily.
+configDependencies:
+  "@tractorbeam/pnpm-plugin-tractorbeam-defaults": latest
 minimumReleaseAgeExclude:
-  - "@cloudflare/*"
-  - wrangler
-  - miniflare
-  - workerd
+  - "@tractorbeam/pnpm-plugin-tractorbeam-defaults"
 allowBuilds:
-  esbuild: true
   lightningcss: true
   msw: false
   unrs-resolver: true
